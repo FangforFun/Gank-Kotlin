@@ -68,6 +68,7 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                     imageViewList.add(imageView)
                 }
                 viewpager.adapter = MyAdapter(imageViewList)
+                indicator.setViewPager(viewpager)
             }
             else -> {
             }

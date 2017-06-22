@@ -63,6 +63,7 @@ dependencies {
     compile dependencies.kotlinReflect
 
     compile dependencies.dragPhotoView
+    compile dependencies.circleIndicator
 
     //deep link
     compile 'com.airbnb:deeplinkdispatch:2.0.1'

@@ -54,7 +54,8 @@ ext {
           kotlinStdlib            : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
           kotlinReflect           : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
 
-          dragPhotoView           : 'com.github.githubwing:DragPhotoView:1.0.1'
+          dragPhotoView           : 'com.github.githubwing:DragPhotoView:1.0.1',
+          circleIndicator         : 'me.relex:circleindicator:1.2.2@aar'
 
   ]
 }
