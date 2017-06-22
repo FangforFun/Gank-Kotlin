@@ -18,6 +18,7 @@ import com.gkzxhn.gank_kotlin.mvp.presenter.GankPresenter
 import com.gkzxhn.gank_kotlin.ui.adapter.MyRvAdapter
 import com.wingsofts.gankclient.bean.FuckGoods
 import com.wingsofts.gankclient.getMainComponent
+import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.fragment_android.*
 import java.util.*
 import javax.inject.Inject
@@ -31,8 +32,13 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
     @Inject lateinit var mPresenter: GankPresenter
 
     override fun initView() {
-        mPresenter.getData(1, GirlFragment.GIRL)
-        mPresenter.getData(1, AndroidFragment.ANDROID)
+        mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
+        mPresenter.getData(10, 1, AndroidFragment.ANDROID)
+        fab.setOnClickListener {
+            view ->
+            mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
+            context.toast("点开看大图~")
+        }
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentAndroidBinding{
@@ -55,12 +61,11 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
         when (type) {
             GirlFragment.GIRL -> {
                 val imageViewList = arrayListOf<ImageView>()
-                Collections.shuffle(results)
-                for (i in 0..4) {
+                for (result in results) {
                     val imageView = ImageView(context)
-                    imageView.setScaleType(ImageView.ScaleType.CENTER)
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP)
                     imageView.isClickable = true
-                    val url = results.get(i).url
+                    val url = result.url
                     imageView.setOnClickListener { view ->
                         ImageActivity.startActivity(context, imageView, url)
                     }

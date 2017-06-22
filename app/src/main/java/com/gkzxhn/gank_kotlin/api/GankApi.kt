@@ -26,10 +26,10 @@ interface GankApi {
     fun getiOSData(@Path("page") page:Int): Observable<JsonResult<List<FuckGoods>>>
 
     /**
-     * iOS所有数据
+     * 福利图片所有数据
      */
-    @GET("data/福利/10/{page}")
-    fun getGirlData(@Path("page") page:Int): Observable<JsonResult<List<FuckGoods>>>
+    @GET("data/福利/{count}/{page}")
+    fun getGirlData(@Path("count") count: Int,@Path("page") page:Int): Observable<JsonResult<List<FuckGoods>>>
 
 
     /**

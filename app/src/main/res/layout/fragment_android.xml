@@ -6,6 +6,7 @@
         android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="280dp">
 
@@ -65,6 +66,15 @@
 
         </android.support.v7.widget.RecyclerView>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            app:layout_anchor="@id/appbar"
+            app:layout_anchorGravity="bottom|right|end"
+            android:src="@android:drawable/ic_menu_rotate"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"/>
 
     </android.support.design.widget.CoordinatorLayout>
 </layout>

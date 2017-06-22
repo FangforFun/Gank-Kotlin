@@ -14,8 +14,8 @@ import javax.inject.Inject
 class GankPresenter
 @Inject constructor(private val mModel: GankModel, private val mView: GankContract.View)
     :GankContract.Presenter, BasePresenter(){
-    override fun getData(page: Int, type: String) {
-        addSubscription(mModel.getData(page, type)
+    override fun getData(count: Int, page: Int, type: String) {
+        addSubscription(mModel.getData(count, page, type)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     res ->

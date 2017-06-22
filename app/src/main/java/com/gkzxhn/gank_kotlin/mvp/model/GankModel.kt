@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GankModel
 @Inject constructor(private val api: GankApi): GankContract.Model {
 
-    override fun getData(page: Int, type: String): Observable<JsonResult<List<FuckGoods>>> {
+    override fun getData(count: Int, page: Int, type: String): Observable<JsonResult<List<FuckGoods>>> {
         when (type) {
             AndroidFragment.ANDROID -> {
                 return api.getAndroidData(page)
@@ -25,7 +25,7 @@ class GankModel
                 return api.getiOSData(page)
             }
             GirlFragment.GIRL -> {
-                return api.getGirlData(page)
+                return api.getGirlData(count, page)
             }
             else -> {
                 return api.getAndroidData(page)

@@ -17,11 +17,11 @@ interface GankContract {
 
     interface Model {
 
-        fun getData(page: Int,type:String): Observable<JsonResult<List<FuckGoods>>>
+        fun getData(count: Int, page: Int, type: String): Observable<JsonResult<List<FuckGoods>>>
     }
 
     interface Presenter {
 
-        fun getData(page: Int, type: String)
+        fun getData(count: Int, page: Int, type: String)
     }
 }
