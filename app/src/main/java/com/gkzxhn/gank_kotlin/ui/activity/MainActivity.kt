@@ -16,6 +16,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun initView() {
         initFragments()
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        navigation.selectedItemId = R.id.navigation_home
     }
 
     lateinit var mFragments: ArrayList<Fragment>

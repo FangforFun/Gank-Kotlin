@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.gkzxhn.gank_kotlin.databinding.FragmentAndroidBinding
 import com.gkzxhn.gank_kotlin.di.component.GankModule
 import com.gkzxhn.gank_kotlin.mvp.contract.GankContract
 import com.gkzxhn.gank_kotlin.mvp.presenter.GankPresenter
+import com.gkzxhn.gank_kotlin.ui.adapter.MyRvAdapter
 import com.wingsofts.gankclient.bean.FuckGoods
 import com.wingsofts.gankclient.getMainComponent
 import kotlinx.android.synthetic.main.fragment_android.*
@@ -30,6 +32,7 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
 
     override fun initView() {
         mPresenter.getData(1, GirlFragment.GIRL)
+        mPresenter.getData(1, AndroidFragment.ANDROID)
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentAndroidBinding{
@@ -69,6 +72,10 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                 }
                 viewpager.adapter = MyAdapter(imageViewList)
                 indicator.setViewPager(viewpager)
+            }
+            ANDROID -> {
+                rv_android.layoutManager = LinearLayoutManager(context)
+                rv_android.adapter = MyRvAdapter(context, results)
             }
             else -> {
             }
