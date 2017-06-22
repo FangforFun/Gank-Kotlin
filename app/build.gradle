@@ -62,9 +62,9 @@ dependencies {
     compile dependencies.kotlinStdlib
     compile dependencies.kotlinReflect
 
+    compile dependencies.dragPhotoView
+
     //deep link
-
-
     compile 'com.airbnb:deeplinkdispatch:2.0.1'
     testCompile 'junit:junit:4.12'
     kapt 'com.airbnb:deeplinkdispatch-processor:2.0.1'
