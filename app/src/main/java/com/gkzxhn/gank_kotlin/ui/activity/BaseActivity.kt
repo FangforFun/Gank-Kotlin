@@ -1,10 +1,14 @@
 package com.gkzxhn.gank_kotlin.ui.activity
 
 import android.databinding.ViewDataBinding
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.WindowManager
 import com.gkzxhn.gank_kotlin.R
+
+
 
 abstract class BaseActivity<B: ViewDataBinding> : AppCompatActivity() {
 
@@ -14,7 +18,7 @@ abstract class BaseActivity<B: ViewDataBinding> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         mBinding = createDataBinding(savedInstanceState)
-
+        initState()
         initView()
     }
 
@@ -33,5 +37,17 @@ abstract class BaseActivity<B: ViewDataBinding> : AppCompatActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_back)
         setSupportActionBar(toolbar)
 
+    }
+
+    /**
+     * 沉浸式状态栏
+     */
+    private fun initState() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            //透明导航栏
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        }
     }
 }

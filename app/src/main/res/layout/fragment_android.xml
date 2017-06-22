@@ -7,7 +7,7 @@
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="256dp">
+            android:layout_height="280dp">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
@@ -15,6 +15,7 @@
                 android:layout_height="match_parent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                 android:fitsSystemWindows="true"
+                android:clipToPadding="true"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleMarginStart="48dp"
                 app:expandedTitleMarginEnd="64dp">
@@ -31,8 +32,8 @@
 
                 <me.relex.circleindicator.CircleIndicator
                     android:id="@+id/indicator"
-                    app:ci_width="3dp"
-                    app:ci_height="3dp"
+                    app:ci_width="6dp"
+                    app:ci_height="6dp"
                     app:ci_margin="5dp"
                     app:ci_drawable="@drawable/circle_shape"
                     app:ci_drawable_unselected="@drawable/circle_unselected_shape"
@@ -44,9 +45,13 @@
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
+                    android:layout_marginTop="16dp"
                     android:layout_height="?attr/actionBarSize"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    app:layout_collapseMode="pin" />
+                    app:layout_collapseMode="pin" >
+
+
+                    </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
