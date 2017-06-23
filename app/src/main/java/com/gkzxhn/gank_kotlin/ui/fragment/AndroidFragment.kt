@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,14 +32,29 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
 
     @Inject lateinit var mPresenter: GankPresenter
 
+    var page: Int = 1
+    private lateinit var myRvAdapter : MyRvAdapter
+
     override fun initView() {
         mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
-        mPresenter.getData(10, 1, AndroidFragment.ANDROID)
+        mPresenter.getData(10, page, AndroidFragment.ANDROID)
         fab.setOnClickListener {
             view ->
             mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
-            context.toast("点开看大图~")
+            context.toast("看看手气~")
         }
+        rv_android.layoutManager = LinearLayoutManager(context)
+        myRvAdapter = MyRvAdapter(context, mList)
+        rv_android.adapter = myRvAdapter
+        rv_android.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView?.canScrollVertically(1)!!) {
+                    mPresenter.getData(10, page++, ANDROID)
+                }
+            }
+        }
+        )
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentAndroidBinding{
@@ -56,6 +72,8 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
             return fragment
         }
     }
+
+    var mList = arrayListOf<FuckGoods>()
 
     override fun setData(results: List<FuckGoods>, type: String) {
         when (type) {
@@ -79,8 +97,8 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                 indicator.setViewPager(viewpager)
             }
             ANDROID -> {
-                rv_android.layoutManager = LinearLayoutManager(context)
-                rv_android.adapter = MyRvAdapter(context, results)
+                mList.addAll(results)
+                myRvAdapter.notifyDataSetChanged()
             }
             else -> {
             }

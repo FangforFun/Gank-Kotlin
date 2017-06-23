@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.gkzxhn.gank_kotlin.databinding.ItemGankBinding
 import com.wingsofts.gankclient.bean.FuckGoods
+import com.wingsofts.gankclient.router.GankClientUri
+import com.wingsofts.gankclient.router.GankRouter
+import java.net.URLEncoder
 
 /**
  * Created by 方 on 2017/6/22.
@@ -28,6 +31,11 @@ class MyRvAdapter(private var context: Context, private var results: List<FuckGo
             holder.binding.iv.visibility = View.VISIBLE
         }else {
             holder.binding.iv.visibility = View.GONE
+        }
+
+        holder.binding.root.setOnClickListener {
+            val url = URLEncoder.encode(results[position].url)
+            GankRouter.router(context, GankClientUri.DETAIL + url)
         }
     }
 
