@@ -22,6 +22,16 @@
             android:theme="@style/translucent"
             android:name=".ui.fragment.ImageActivity"/>
         <activity android:name=".ui.activity.DetailActivity"/>
+        <activity android:name="com.airbnb.deeplinkdispatch.DeepLinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="gank" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

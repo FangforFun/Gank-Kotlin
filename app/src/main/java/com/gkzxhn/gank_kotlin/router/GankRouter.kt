@@ -11,6 +11,7 @@ object GankRouter{
     fun router(context: Context,uri : String){
         val intent = Intent()
         intent.data = Uri.parse(uri)
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
         intent.action = Intent.ACTION_VIEW
         context.startActivity(intent)
     }

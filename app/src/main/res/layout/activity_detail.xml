@@ -6,14 +6,16 @@
         android:id="@+id/activity_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+          android:fitsSystemWindows="true"
+          android:clipToPadding="true"
         android:orientation="vertical"
         tools:context="com.wingsofts.gankclient.ui.activity.DetailActivity">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
+            android:background="?attr/colorPrimary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_title"
