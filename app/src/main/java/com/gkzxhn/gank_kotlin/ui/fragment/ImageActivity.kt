@@ -26,6 +26,9 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
             Log.i("ImageActivity", "dragPhotoView 1 : " + fl4)
             finish()
         }
+        drag_photo.setOnTapListener { view ->
+            finish()
+        }
         mBinding.url = intent.getStringExtra(IMG)
     }
 

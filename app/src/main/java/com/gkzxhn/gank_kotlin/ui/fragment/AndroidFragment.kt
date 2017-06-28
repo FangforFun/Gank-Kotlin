@@ -3,7 +3,9 @@ package com.gkzxhn.gank_kotlin.ui.fragment
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
+import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -31,6 +33,8 @@ import javax.inject.Inject
 class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(){
 
     @Inject lateinit var mPresenter: GankPresenter
+    private val INTERPOLATOR = FastOutSlowInInterpolator()
+    private var isEnd = true
 
     var page: Int = 1
     private lateinit var myRvAdapter : MyRvAdapter
@@ -49,12 +53,31 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
         rv_android.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+                if (recyclerView?.layoutManager is LinearLayoutManager) {
+                    val position = recyclerView.layoutManager.getPosition(recyclerView.getChildAt(0))
+                    if (position == 0) {
+                        //回到顶部时调用的方法
+                        if (fab2top.visibility == View.VISIBLE && !isEnd) {
+                            ViewCompat.animate(fab2top).scaleX(0.0f).scaleY(0.0f).alpha(0.0f)
+                                    .setInterpolator(INTERPOLATOR)
+                                    .withLayer()
+                                    .start()
+                        }else {
+                            isEnd = false
+                        }
+                    }
+                }
                 if (!recyclerView?.canScrollVertically(1)!!) {
                     mPresenter.getData(10, ++page, ANDROID)
                 }
             }
         }
         )
+        fab2top.setOnClickListener {
+            view ->
+            //回到顶部
+            rv_android.smoothScrollToPosition(0)
+        }
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentAndroidBinding{

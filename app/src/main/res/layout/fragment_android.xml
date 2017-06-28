@@ -76,5 +76,15 @@
             android:layout_margin="@dimen/fab_margin"
             android:clickable="true"/>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab2top"
+            android:visibility="invisible"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@android:drawable/arrow_up_float"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_gravity="end|bottom"
+            app:layout_behavior="@string/float_behavior"
+            android:clickable="true"/>
     </android.support.design.widget.CoordinatorLayout>
 </layout>
