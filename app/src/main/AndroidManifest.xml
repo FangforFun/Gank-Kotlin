@@ -22,7 +22,8 @@
             android:theme="@style/translucent"
             android:name=".ui.fragment.ImageActivity"/>
         <activity android:name=".ui.activity.DetailActivity"/>
-        <activity android:name="com.airbnb.deeplinkdispatch.DeepLinkActivity">
+        <activity android:name="com.airbnb.deeplinkdispatch.DeepLinkActivity"
+            android:theme="@style/Base.Theme.DesignDemo">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
