@@ -39,4 +39,12 @@ class DetailActivity : BaseActivity<ActivityDetailBinding>(){
     override fun createDataBinding(savedInstanceState: Bundle?): ActivityDetailBinding {
         return DataBindingUtil.setContentView(this, R.layout.activity_detail)
     }
+
+    override fun onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();//返回上一页面
+        }else {
+            super.onBackPressed()
+        }
+    }
 }
