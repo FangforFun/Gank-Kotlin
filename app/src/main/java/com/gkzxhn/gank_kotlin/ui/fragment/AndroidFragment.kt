@@ -2,9 +2,7 @@ package com.gkzxhn.gank_kotlin.ui.fragment
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPager
 import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -18,6 +16,7 @@ import com.gkzxhn.gank_kotlin.databinding.FragmentAndroidBinding
 import com.gkzxhn.gank_kotlin.di.component.GankModule
 import com.gkzxhn.gank_kotlin.mvp.contract.GankContract
 import com.gkzxhn.gank_kotlin.mvp.presenter.GankPresenter
+import com.gkzxhn.gank_kotlin.ui.adapter.MyPhotoPagerAdapter
 import com.gkzxhn.gank_kotlin.ui.adapter.MyRvAdapter
 import com.wingsofts.gankclient.bean.FuckGoods
 import com.wingsofts.gankclient.getMainComponent
@@ -102,13 +101,17 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
         when (type) {
             GirlFragment.GIRL -> {
                 val imageViewList = arrayListOf<ImageView>()
+                val urls = arrayListOf<String>()
                 for (result in results) {
+                    urls.add(result.url)
+                }
+                for (index in results.indices) {
                     val imageView = ImageView(context)
                     imageView.setScaleType(ImageView.ScaleType.CENTER_CROP)
                     imageView.isClickable = true
-                    val url = result.url
+                    val url = results.get(index).url
                     imageView.setOnClickListener { view ->
-                        ImageActivity.startActivity(context, imageView, url)
+                        ImageActivity.startActivity(context, imageView, urls, index)
                     }
                     Glide.with(imageView.context)
                             .load(url)
@@ -116,7 +119,7 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                             .into(imageView)
                     imageViewList.add(imageView)
                 }
-                viewpager.adapter = MyAdapter(imageViewList)
+                viewpager.adapter = MyPhotoPagerAdapter(imageViewList)
                 indicator.setViewPager(viewpager)
             }
             ANDROID -> {
@@ -126,23 +129,5 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
             else -> {
             }
         }
-    }
-}
-
-class MyAdapter(private var results: ArrayList<ImageView>) : PagerAdapter() {
-
-    override fun isViewFromObject(view: View?, `object`: Any?): Boolean {
-        return view == `object`
-    }
-
-    override fun getCount() = results.size
-
-    override fun instantiateItem(container: ViewGroup?, position: Int): Any {
-        container!!.addView(results.get(position))
-        return results.get(position)
-    }
-
-    override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
-        (container as ViewPager).removeView(results.get(position))
     }
 }

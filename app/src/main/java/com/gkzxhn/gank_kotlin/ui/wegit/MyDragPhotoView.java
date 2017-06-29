@@ -74,7 +74,13 @@ public class MyDragPhotoView extends PhotoView{
     }
 
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if(this.getScale() == 1.0F) {
+        float scale = 0;
+        try {
+            scale = this.getScale();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(scale == 1.0F) {
             switch(event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     this.onActionDown(event);
@@ -117,6 +123,36 @@ public class MyDragPhotoView extends PhotoView{
                     if(this.mTranslateY >= 0.0F && (double)this.mScale < 0.95D) {
                         return true;
                     }
+            }
+        }else {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN :
+                    canFinish = !canFinish;
+                    break;
+
+                case MotionEvent.ACTION_UP :
+                    if (!canFinish || afterMove) {
+                        afterMove = false;
+                        canFinish = false;
+                        return super.dispatchTouchEvent(event);
+                    }
+                    if(event.getPointerCount() == 1) {
+                        Runnable runnable = new Runnable() {
+                            public void run() {
+                                if (MyDragPhotoView.this.mTranslateX == 0.0F && MyDragPhotoView.this.mTranslateY == 0.0F && MyDragPhotoView.this.canFinish && MyDragPhotoView.this.mTapListener != null) {
+                                    MyDragPhotoView.this.mTapListener.onTap(MyDragPhotoView.this);
+                                }
+                                MyDragPhotoView.this.canFinish = false;
+                            }
+                        };
+                        this.postDelayed(runnable, 300L);
+                        return super.dispatchTouchEvent(event);
+                    }
+                    afterMove = false;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    afterMove = true;
+                    return super.dispatchTouchEvent(event);
             }
         }
 
