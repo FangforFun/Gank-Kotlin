@@ -21,6 +21,9 @@ class GankModel
             AndroidFragment.ANDROID -> {
                 return api.getAndroidData(page)
             }
+            IosFragment.SHIPIN -> {
+                return api.getShiPinData(page)
+            }
             IosFragment.IOS -> {
                 return api.getiOSData(page)
             }

@@ -36,18 +36,33 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         val transaction = supportFragmentManager.beginTransaction()
         when (item.itemId) {
             R.id.navigation_home -> {
-                transaction.replace(R.id.content, mFragments.get(0))
-                transaction.commit()
+                if (!mFragments[0].isAdded) {
+                    transaction.add(R.id.content, mFragments.get(0))
+                }
+                transaction.show(mFragments[0])
+                        .hide(mFragments[1])
+                        .hide(mFragments[2])
+                        .commit()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
-                transaction.replace(R.id.content, mFragments.get(1))
-                transaction.commit()
+                if (!mFragments[1].isAdded) {
+                    transaction.add(R.id.content, mFragments.get(1))
+                }
+                transaction.show(mFragments[1])
+                        .hide(mFragments[0])
+                        .hide(mFragments[2])
+                        .commit()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
-                transaction.replace(R.id.content, mFragments.get(2))
-                transaction.commit()
+                if (!mFragments[2].isAdded) {
+                transaction.add(R.id.content, mFragments.get(2))
+                }
+                transaction.show(mFragments[2])
+                        .hide(mFragments[1])
+                        .hide(mFragments[0])
+                        .commit()
                 return@OnNavigationItemSelectedListener true
             }
         }

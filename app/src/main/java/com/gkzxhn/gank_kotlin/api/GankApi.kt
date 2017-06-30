@@ -19,6 +19,9 @@ interface GankApi {
     @GET("data/Android/10/{page}")
     fun getAndroidData(@Path("page") page:Int): Observable<JsonResult<List<FuckGoods>>>
 
+    @GET("data/休息视频/10/{page}")
+    fun getShiPinData(@Path("page") page:Int): Observable<JsonResult<List<FuckGoods>>>
+
     /**
      * iOS所有数据
      */
