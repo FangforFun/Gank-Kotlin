@@ -46,16 +46,6 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
     private val mPhotoViews = arrayListOf<ImageView>()
 
     override fun initView() {
-        /*drag_photo.setOnExitListener { dragPhotoView, fl1, fl2, fl3, fl4 ->
-            Log.i("ImageActivity", "dragPhotoView 1 : " + fl1)
-            Log.i("ImageActivity", "dragPhotoView 1 : " + fl2)
-            Log.i("ImageActivity", "dragPhotoView 1 : " + fl3)
-            Log.i("ImageActivity", "dragPhotoView 1 : " + fl4)
-            finish()
-        }
-        drag_photo.setOnTapListener { view ->
-            finish()
-        }*/
 //        mBinding.url = intent.getStringExtra(IMG)
         urls = intent.getStringArrayListExtra(IMG)
         val index = intent.getIntExtra(INDEX, 0)
@@ -69,6 +59,7 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
             }
             Glide.with(imageView.context)
                     .load(url)
+                    .error(R.drawable.error_photo)
                     .crossFade()
                     .into(imageView)
             mPhotoViews.add(imageView)

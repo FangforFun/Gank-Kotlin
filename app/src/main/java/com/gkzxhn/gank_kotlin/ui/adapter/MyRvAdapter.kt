@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.gkzxhn.gank_kotlin.databinding.ItemGankBinding
+import com.gkzxhn.gank_kotlin.ui.fragment.ImageActivity
 import com.wingsofts.gankclient.bean.FuckGoods
 import com.wingsofts.gankclient.router.GankClientUri
 import com.wingsofts.gankclient.router.GankRouter
@@ -29,6 +30,9 @@ class MyRvAdapter(private var context: Context, private var results: List<FuckGo
                     .crossFade()
                     .into(holder.binding.iv)
             holder.binding.iv.visibility = View.VISIBLE
+            holder.binding.iv.setOnClickListener {
+                ImageActivity.startActivity(context, holder.binding.iv, result.images, 0)
+            }
         }else {
             holder.binding.iv.visibility = View.GONE
         }

@@ -159,8 +159,10 @@ public class MyDragPhotoView extends PhotoView{
         return super.dispatchTouchEvent(event);
     }
 
+    private final float CRITICALY = 250.0f; //触发OnExitListener的临界偏移量
+
     private void onActionUp(MotionEvent event) {
-        if(this.mTranslateY > 200.0F) {
+        if(this.mTranslateY > CRITICALY) {
             if(this.mExitListener == null) {
                 throw new RuntimeException("DragPhotoView: onExitLister can\'t be null ! call setOnExitListener() ");
             }
@@ -181,7 +183,7 @@ public class MyDragPhotoView extends PhotoView{
             this.mTranslateY = 0.0F;
         }
 
-        float percent = this.mTranslateY / 500.0F;
+        float percent = this.mTranslateY / CRITICALY;
         if(this.mScale >= this.mMinScale && this.mScale <= 1.0F) {
             this.mScale = 1.0F - percent;
             this.mAlpha = (int)(255.0F * (1.0F - percent));
