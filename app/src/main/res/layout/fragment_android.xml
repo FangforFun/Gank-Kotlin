@@ -43,27 +43,44 @@
                     android:layout_height="48dp"/>
 
                 </FrameLayout>
+
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_marginTop="16dp"
                     android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
 
+                    <android.support.v7.widget.SearchView
+                        android:id="@+id/search_view"
+                        android:iconifiedByDefault="false"
+                        app:iconifiedByDefault="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
-                    </android.support.v7.widget.Toolbar>
+                </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_android"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/srl_android"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
         </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

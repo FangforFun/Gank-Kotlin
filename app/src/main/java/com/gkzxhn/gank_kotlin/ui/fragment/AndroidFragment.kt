@@ -6,10 +6,12 @@ import android.support.v4.view.ViewCompat
 import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.databinding.FragmentAndroidBinding
@@ -24,6 +26,7 @@ import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.fragment_android.*
 import java.util.*
 import javax.inject.Inject
+
 
 /**
  * Created by 方 on 2017/6/21.
@@ -41,6 +44,11 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
     override fun initView() {
         mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
         mPresenter.getData(10, page, AndroidFragment.ANDROID)
+        srl_android.setOnRefreshListener {
+            page = 1
+            mPresenter.getData(10, page, AndroidFragment.ANDROID)
+        }
+        setSearchView()
         fab.setOnClickListener {
             view ->
             mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
@@ -76,6 +84,32 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
             view ->
             //回到顶部
             rv_android.smoothScrollToPosition(0)
+        }
+        appbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (verticalOffset == 0) {
+                //完全展开状态
+                search_view.visibility = View.INVISIBLE
+            } else if (Math.abs(verticalOffset) == appBarLayout.totalScrollRange) {
+                //appBarLayout.getTotalScrollRange() == 100
+                //完全折叠
+                search_view.visibility = View.VISIBLE
+            }
+        }
+        srl_android.isRefreshing = true
+    }
+
+    private fun setSearchView() {
+        if (search_view == null) {
+            return
+        } else {
+            //获取到TextView的控件
+            val textView = search_view.findViewById(R.id.search_src_text) as TextView
+            //设置字体大小为14sp
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)//14sp
+            //设置字体颜色
+            textView.setTextColor(activity.resources.getColor(R.color.search_txt_color))
+            //设置提示文字颜色
+            textView.setHintTextColor(activity.resources.getColor(R.color.search_hint_color))
         }
     }
 
@@ -123,6 +157,10 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                 indicator.setViewPager(viewpager)
             }
             ANDROID -> {
+                if (srl_android.isRefreshing) {
+                    mList.clear()
+                    srl_android.isRefreshing = false
+                }
                 mList.addAll(results)
                 myRvAdapter.notifyDataSetChanged()
             }
