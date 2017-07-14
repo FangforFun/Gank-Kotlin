@@ -9,6 +9,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -28,6 +29,8 @@ import kotlinx.android.synthetic.main.activity_image.*
  */
 class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
+    val TAG = this.javaClass.simpleName
+
     private lateinit var urls : ArrayList<String>
 
     var mOriginLeft: Int = 0
@@ -36,6 +39,8 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
     var mOriginWidth: Int = 0
     var mOriginCenterX: Int = 0
     var mOriginCenterY: Int = 0
+    private var targetX: Int = 0
+    private var targetY: Int = 0
     private var mTargetHeight: Float = 0.toFloat()
     private var mTargetWidth: Float = 0.toFloat()
     private var mScaleX: Float = 0.toFloat()
@@ -89,8 +94,10 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         mScaleX = mOriginWidth.toFloat() / mTargetWidth
                         mScaleY = mOriginHeight.toFloat() / mTargetHeight
 
-                        val targetCenterX = location[0] + mTargetWidth / 2
-                        val targetCenterY = location[1] + mTargetHeight / 2
+                        targetX = location[0]
+                        targetY = location[1]
+                        val targetCenterX = targetX + mTargetWidth / 2
+                        val targetCenterY = targetY + mTargetHeight / 2
 
                         mTranslationX = mOriginCenterX - targetCenterX
                         mTranslationY = mOriginCenterY - targetCenterY
@@ -102,9 +109,9 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
                         performEnterAnimation()
 
-                        for (i in 0..this@ImageActivity.mPhotoViews.size - 1) {
+                        /*for (i in 0..this@ImageActivity.mPhotoViews.size - 1) {
                             (this@ImageActivity.mPhotoViews[i] as MyDragPhotoView).setMinScale(mScaleX)
-                        }
+                        }*/
                     }
                 })
     }
@@ -122,7 +129,7 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
             intent.putExtra(INDEX, index)
 
             val location = intArrayOf(0, 1)
-            imageView.getLocationOnScreen(location);
+            imageView.getLocationOnScreen(location)
             intent.putExtra("left", location[0]);
             intent.putExtra("top", location[1]);
             intent.putExtra("height", imageView.getHeight());
@@ -137,15 +144,19 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
     }
 
     /**
-     * ===================================================================================
-     * 底下是低版本"共享元素"实现   不需要过分关心  如有需要 可作为参考.
+     *
      */
     private fun performExitAnimation(view: MyDragPhotoView, x: Float, y: Float, w: Float, h: Float) {
-        view.finishAnimationCallBack()
-        val viewX = mTargetWidth / 2 + x - mTargetWidth * mScaleX / 2
-        val viewY = mTargetHeight / 2 + y - mTargetHeight * mScaleY / 2
-        view.x = viewX
-        view.y = viewY
+        Log.i(TAG, "traslateX : " + x)
+        Log.i(TAG, "traslateY : " + y)
+        Log.i(TAG, "width : " + w)
+        Log.i(TAG, "height : " + h)
+
+//        view.finishAnimationCallBack()
+        val viewX = mTargetWidth / 2 + x - /*mTargetWidth * mScaleX*/w / 2
+        val viewY = mTargetHeight / 2 + y -/* mTargetHeight * mScaleY */h/ 2
+//        view.x = viewX
+//        view.y = viewY
 
         val centerX = view.x + mOriginWidth / 2
         val centerY = view.y + mOriginHeight / 2
@@ -153,14 +164,30 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
         val translateX = mOriginCenterX - centerX
         val translateY = mOriginCenterY - centerY
 
+        val scaleX = view.scaleX
+        val scaleY = view.scaleY
 
-        val translateXAnimator = ValueAnimator.ofFloat(view.x, view.x + translateX)
-        translateXAnimator.addUpdateListener { valueAnimator -> view.x = valueAnimator.animatedValue as Float }
+        val scaleXAnimator = ValueAnimator.ofFloat(view.getmScale(),  mOriginWidth/mTargetWidth)
+        scaleXAnimator.addUpdateListener { valueAnimator ->
+            view.scaleX = valueAnimator.animatedValue as Float }
+        scaleXAnimator.duration = 300
+        scaleXAnimator.start()
+        val scaleYAnimator = ValueAnimator.ofFloat(view.getmScale(),  mOriginHeight/mTargetHeight)
+        scaleYAnimator.addUpdateListener { valueAnimator ->
+            view.scaleY = valueAnimator.animatedValue as Float }
+        scaleYAnimator.duration = 300
+        scaleYAnimator.start()
+
+        val translateXAnimator = ValueAnimator.ofFloat(x, 0f)
+        translateXAnimator.addUpdateListener { valueAnimator ->
+            view.x = valueAnimator.animatedValue as Float }
         translateXAnimator.duration = 300
         translateXAnimator.start()
-        val translateYAnimator = ValueAnimator.ofFloat(view.y, view.y + translateY)
-        translateYAnimator.addUpdateListener { valueAnimator -> view.y = valueAnimator.animatedValue as Float }
-        translateYAnimator.addListener(object : Animator.AnimatorListener {
+        val translateYAnimator = ValueAnimator.ofFloat(y - (1 - view.getmScale()) * mTargetHeight / 2,
+                mOriginTop.toFloat() + mOriginHeight.toFloat() / 2 - mTargetHeight / 2)
+        translateYAnimator.addUpdateListener { valueAnimator ->
+            view.y = valueAnimator.animatedValue as Float }
+        scaleYAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animator: Animator) {
 
             }

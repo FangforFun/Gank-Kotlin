@@ -9,8 +9,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.wingsofts.dragphotoview.DragPhotoView;
-
 import uk.co.senab.photoview.PhotoView;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
@@ -56,7 +54,7 @@ public class MyDragPhotoView extends PhotoView{
         this.isAnimate = false;
         this.isTouchEvent = false;
         this.mPaint = new Paint();
-        this.mPaint.setColor(-16777216);
+        this.mPaint.setColor(16777216);
     }
 
     protected void onDraw(Canvas canvas) {
@@ -159,7 +157,7 @@ public class MyDragPhotoView extends PhotoView{
         return super.dispatchTouchEvent(event);
     }
 
-    private final float CRITICALY = 250.0f; //触发OnExitListener的临界偏移量
+    private final float CRITICALY = 100.0f; //触发OnExitListener的临界偏移量
 
     private void onActionUp(MotionEvent event) {
         if(this.mTranslateY > CRITICALY) {
@@ -183,7 +181,7 @@ public class MyDragPhotoView extends PhotoView{
             this.mTranslateY = 0.0F;
         }
 
-        float percent = this.mTranslateY / CRITICALY;
+        float percent = this.mTranslateY / 1500f;
         if(this.mScale >= this.mMinScale && this.mScale <= 1.0F) {
             this.mScale = 1.0F - percent;
             this.mAlpha = (int)(255.0F * (1.0F - percent));
@@ -304,5 +302,13 @@ public class MyDragPhotoView extends PhotoView{
 
     public interface OnTapListener {
         void onTap(MyDragPhotoView var1);
+    }
+
+    public float getmScale() {
+        return mScale;
+    }
+
+    public void setmScale(float scale) {
+        mScale = scale;
     }
 }
