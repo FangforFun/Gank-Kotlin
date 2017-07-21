@@ -13,7 +13,7 @@ import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
  */
 class GirlFragment : BaseFragment<FragmentGirlBinding>(){
     override fun initView() {
-//        tv_android.text = "hahaha"
+
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentGirlBinding{

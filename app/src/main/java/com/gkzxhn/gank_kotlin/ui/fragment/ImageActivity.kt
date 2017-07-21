@@ -9,6 +9,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.ImageView
@@ -50,12 +51,14 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
     private val mPhotoViews = arrayListOf<ImageView>()
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun initView() {
 //        mBinding.url = intent.getStringExtra(IMG)
         urls = intent.getStringArrayListExtra(IMG)
         val index = intent.getIntExtra(INDEX, 0)
         for (url in urls) {
             val imageView = MyDragPhotoView(this)
+            imageView.transitionName = "img"
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER)
             imageView.isClickable = true
             imageView.setOnTapListener { finishWithAnimation() }

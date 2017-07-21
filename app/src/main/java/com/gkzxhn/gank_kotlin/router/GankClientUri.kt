@@ -12,5 +12,5 @@ object GankClientUri {
 
     //详情页
     const val DETAIL_PARAM_URL = "url"
-    const val DETAIL = "gank://androidwing.net/detail/"
+    const val DETAIL = "ganhuo://android.net/detail/"
 }

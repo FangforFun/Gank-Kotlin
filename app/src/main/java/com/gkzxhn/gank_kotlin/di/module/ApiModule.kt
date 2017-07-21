@@ -2,7 +2,9 @@ package com.gkzxhn.gank_kotlin.di.module
 
 import android.content.Context
 import android.util.Log
+import com.gkzxhn.gank_kotlin.api.ApiService
 import com.gkzxhn.gank_kotlin.api.GankApi
+import com.gkzxhn.gank_kotlin.api.RetrofitClient
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.wingsofts.gankclient.di.module.AppModule
@@ -39,6 +41,10 @@ class ApiModule {
     @Provides fun provideGson() = GsonBuilder().create()
 
     @Provides fun provideApi(retrofit: Retrofit) = retrofit.create(GankApi::class.java)
+
+    @Provides fun provideKaiyanApi(context: Context) = RetrofitClient
+            .getInstance(context, ApiService.BASE_URL)
+            .retrofit!!.create(ApiService::class.java)
 
     @Provides fun provideOkhttp(context: Context, interceptor: HttpLoggingInterceptor): OkHttpClient {
         val cacheSize = 1024 * 1024 * 10L

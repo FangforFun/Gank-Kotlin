@@ -1,6 +1,7 @@
 package com.gkzxhn.gank_kotlin.di.component
 
 import com.gkzxhn.gank_kotlin.mvp.contract.GankContract
+import com.gkzxhn.gank_kotlin.mvp.contract.KaiyanContract
 import com.gkzxhn.gank_kotlin.ui.fragment.AndroidFragment
 import com.gkzxhn.gank_kotlin.ui.fragment.IosFragment
 import com.gkzxhn.gank_kotlin.ui.fragment.KaiyanVideoFragment
@@ -13,15 +14,16 @@ import dagger.Subcomponent
  * Created by 方 on 2017/6/20.
  */
 
-@Subcomponent(modules = arrayOf(GankModule::class, KaiyanModule::class))
-interface GankComponent {
-    fun inject(fragment: AndroidFragment)
-    fun inject(fragment: IosFragment)
+@Subcomponent(modules = arrayOf(KaiyanModule::class))
+interface KaiyanComponent {
+
+    fun inject(fragment: KaiyanVideoFragment)
 
 //    fun inject(fragment: GirlFragment)
 }
 
 @Module
-class GankModule(private val mView: GankContract.View) {
+class KaiyanModule(private val mView: KaiyanContract.View) {
     @Provides fun getView() = mView
 }
+

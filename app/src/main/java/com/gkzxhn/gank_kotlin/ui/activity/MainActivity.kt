@@ -8,7 +8,7 @@ import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.databinding.ActivityMainBinding
 import com.gkzxhn.gank_kotlin.ui.fragment.AndroidFragment
 import com.gkzxhn.gank_kotlin.ui.fragment.GirlFragment
-import com.gkzxhn.gank_kotlin.ui.fragment.IosFragment
+import com.gkzxhn.gank_kotlin.ui.fragment.ShipinFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
@@ -24,7 +24,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun initFragments() {
         mFragments = ArrayList()
         mFragments.add(AndroidFragment.newInstance())
-        mFragments.add(IosFragment.newInstance())
+        mFragments.add(ShipinFragment.newInstance())
         mFragments.add(GirlFragment.newInstance())
     }
 
