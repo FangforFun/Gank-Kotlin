@@ -13,7 +13,10 @@ import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
  */
 class GirlFragment : BaseFragment<FragmentGirlBinding>(){
     override fun initView() {
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     override fun createDataBinding(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): FragmentGirlBinding{

@@ -71,6 +71,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     kapt 'com.airbnb:deeplinkdispatch-processor:2.0.1'
     kapt 'com.android.databinding:compiler:2.3.3'
+
+    compile 'com.shuyu:GSYVideoPlayer:2.0.0'
 }
 
 kapt {
