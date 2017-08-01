@@ -1,9 +1,11 @@
 package com.gkzxhn.gank_kotlin.api
 
 import android.app.Application
+import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.di.component.ApiComponent
 import com.gkzxhn.gank_kotlin.di.component.DaggerApiComponent
 import com.gkzxhn.gank_kotlin.di.module.ApiModule
+import com.iflytek.cloud.SpeechUtility
 import com.wingsofts.gankclient.di.module.AppModule
 import javax.inject.Inject
 
@@ -20,6 +22,8 @@ class App : Application() {
     @Inject lateinit var apiComponent: ApiComponent
 
     override fun onCreate() {
+        SpeechUtility.createUtility(this, "appid=" + getString(R.string.xunfei_id))
+
         super.onCreate()
 
         DaggerApiComponent.builder().apiModule(ApiModule()).appModule(AppModule(this)).build().inject(this)

@@ -5,6 +5,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+    <EditText
+        android:id="@+id/et_recognize"
+        android:layout_above="@+id/iat_recognize"
+        android:lines="5"
+        android:layout_marginBottom="12dp"
+        android:hint="备忘?心情?纪念?统统写/说下来~"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/iat_recognize"
+        android:text="点击 说话"
+        android:gravity="center"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/record_selector"
+        android:layout_centerHorizontal="true"
+        android:layout_width="150dp"
+        android:layout_height="30dp"/>
 
 </RelativeLayout>
 </layout>

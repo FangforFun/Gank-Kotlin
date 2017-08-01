@@ -5,4 +5,8 @@
     <string name="title_dashboard">视频</string>
     <string name="title_notifications">Notifications</string>
     <string name="float_behavior">com.gkzxhn.gank_kotlin.ui.wegit.ScrollAwareFABBehaviorDefault</string>
+
+    <string name="xunfei_id">597ee7bd</string>
+    <string name="text_begin">请开始说话</string>
+
 </resources>

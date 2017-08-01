@@ -55,7 +55,9 @@ ext {
           kotlinReflect           : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
 
           dragPhotoView           : 'com.github.githubwing:DragPhotoView:1.0.1',
-          circleIndicator         : 'me.relex:circleindicator:1.2.2@aar'
+          circleIndicator         : 'me.relex:circleindicator:1.2.2@aar',
 
+          greendao                : 'org.greenrobot:greendao:3.2.2' ,
+          greendao_update         : 'com.github.yuweiguocn:GreenDaoUpgradeHelper:v1.3.0'
   ]
 }
