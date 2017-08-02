@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="com.gkzxhn.gank_kotlin.bean.entity.Remind"/>
+        <import type="com.gkzxhn.gank_kotlin.utils.DateUtil"/>
+        <import type="android.view.View"/>
         <variable
             name="data"
             type="Remind"/>
@@ -14,14 +16,55 @@
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:layout_height="68dp">
+        android:layout_height="88dp">
+
+        <RelativeLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_width="86dp"
+            android:layout_height="80dp">
+
+            <TextView
+                android:textSize="35sp"
+                android:textColor="@android:color/black"
+                android:visibility="@{DateUtil.isToOrYes(data.time)? View.VISIBLE : View.GONE}"
+                android:text="@{DateUtil.getToOrYesString(data.time)}"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"/>
+
+            <TextView
+                android:id="@+id/tv_day"
+                android:visibility="@{DateUtil.isToOrYes(data.time) ? View.GONE : View.VISIBLE}"
+                android:text="@{DateUtil.getDayString(data.time)}"
+                android:textColor="@android:color/black"
+                android:textSize="35sp"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"/>
+
+            <TextView
+                android:layout_toRightOf="@+id/tv_day"
+                android:visibility="@{DateUtil.isToOrYes(data.time) ? View.GONE : View.VISIBLE}"
+                android:layout_marginTop="16dp"
+                android:textColor="@android:color/black"
+                android:text="@{DateUtil.getMonthString(data.time)}"
+                android:textSize="18sp"
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"/>
+        </RelativeLayout>
 
         <TextView
-            android:layout_marginLeft="25dp"
-            android:gravity="center"
+            android:layout_marginLeft="20dp"
+            android:maxLines="5"
+            android:minLines="1"
             android:text="@{data.content_detail}"
-            android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
     </LinearLayout>
 </layout>

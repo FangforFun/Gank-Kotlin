@@ -42,7 +42,7 @@ class MyRemindActivity : BaseActivity<ActivityMyRemindBinding>(){
         rxRemindDao.list()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    t -> mList.addAll(t)
+                    t -> mList.addAll(t.reversed())
                     mAdapter.notifyDataSetChanged()
                 }, {
                     e -> Log.i(TAG , e.message)
