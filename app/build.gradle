@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+
+apply plugin: 'org.greenrobot.greendao'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -80,4 +83,11 @@ dependencies {
 
 kapt {
     generateStubs = true
+}
+
+greendao {
+    schemaVersion 1
+    daoPackage 'com.greendao.gen'
+    targetGenDir 'src/main/java'
+    //generateTests true//设置是否自动生成单元测试。
 }

@@ -3,12 +3,16 @@ package com.gkzxhn.gank_kotlin.ui.fragment
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.Environment
-import android.os.SystemClock
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.gkzxhn.gank_kotlin.R
+import com.gkzxhn.gank_kotlin.bean.entity.PersonalInfo
+import com.gkzxhn.gank_kotlin.bean.entity.Remind
+import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
+import com.gkzxhn.gank_kotlin.ui.adapter.PersonalListAdapter
 import com.gkzxhn.gank_kotlin.utils.JsonParser
 import com.iflytek.cloud.*
 import com.iflytek.cloud.ui.RecognizerDialog
@@ -16,8 +20,11 @@ import com.iflytek.cloud.ui.RecognizerDialogListener
 import com.iflytek.sunflower.FlowerCollector
 import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.fragment_girl.*
+import org.greenrobot.greendao.rx.RxDao
 import org.json.JSONException
 import org.json.JSONObject
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -37,7 +44,24 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
     // 引擎类型
     private var mEngineType = SpeechConstant.TYPE_CLOUD
 
+    private lateinit var rxRemindDao : RxDao<Remind, Long>
+
+    private lateinit var path : String
+
+    private var time: Long = 0L
+
+    private lateinit var mAdapter: PersonalListAdapter
+
+    private val mList = arrayListOf<PersonalInfo>()
+
     override fun initView() {
+
+        rxRemindDao = GreenDaoHelper.getDaoSession().remindDao.rx()
+
+        rv_personal.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        mList.add(PersonalInfo(R.drawable.ic_empty_picture, resources.getString(R.string.remind_record)))
+        mAdapter = PersonalListAdapter(context, mList)
+        rv_personal.adapter = mAdapter
 
         // 初始化识别无UI识别对象
         // 使用SpeechRecognizer对象，可根据回调消息自定义界面；
@@ -117,7 +141,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         mIat?.setParameter(SpeechConstant.VAD_BOS, "4000")
 
         // 设置语音后端点:后端点静音检测时间，即用户停止说话多长时间内即认为不再输入， 自动停止录音
-        mIat?.setParameter(SpeechConstant.VAD_EOS, "1000")
+        mIat?.setParameter(SpeechConstant.VAD_EOS, "2000")
 
         // 设置标点符号,设置为"0"返回结果无标点,设置为"1"返回结果有标点
         mIat?.setParameter(SpeechConstant.ASR_PTT, "1")
@@ -125,7 +149,8 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mIat?.setParameter(SpeechConstant.AUDIO_FORMAT, "wav")
-        val path = Environment.getExternalStorageDirectory().toString() + "/msc/ ${SystemClock.currentThreadTimeMillis()} .wav"
+        time = System.currentTimeMillis()
+        path = Environment.getExternalStorageDirectory().toString() + "/msc/ $time .wav"
         mIat?.setParameter(SpeechConstant.ASR_AUDIO_PATH, path)
         }
 
@@ -147,14 +172,16 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
     }
 
     private fun printResult(results: RecognizerResult) {
-        Log.i(tag, results.resultString)
+        Log.i(TAG, results.resultString)
         val text = JsonParser.parseIatResult(results.resultString)
 
         var sn: String? = null
+        var ls: Boolean = false
         // 读取json结果中的sn字段
         try {
             val resultJson = JSONObject(results.resultString)
             sn = resultJson.optString("sn")
+            ls = resultJson.optBoolean("ls")
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -168,5 +195,22 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
 
         et_recognize.setText(resultBuffer.toString())
         et_recognize.setSelection(et_recognize.length())
+        Log.i(TAG, resultBuffer.toString())
+
+        if (ls) {
+            val remind = Remind()
+            remind.time = time
+            remind.content_detail = resultBuffer.toString()
+            remind.voice_uri = path
+            rxRemindDao.insert(remind)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        t -> context.toast(t.content_detail)
+                    }, {
+                        e -> Log.i(TAG, e.message)
+                    })
+        }
     }
 }

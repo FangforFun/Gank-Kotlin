@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.gkzxhn.gank_kotlin.bean.entity.PersonalInfo"/>
+        <variable
+            name="data"
+            type="PersonalInfo"/>
+
+    </data>
+
+    <LinearLayout
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="48dp">
+
+        <ImageView
+            android:layout_marginLeft="25dp"
+            app:load_asset="@{data.resource}"
+            android:layout_gravity="center_vertical"
+            android:layout_width="26dp"
+            android:layout_height="26dp"/>
+
+        <TextView
+            android:layout_marginLeft="25dp"
+            android:gravity="center"
+            android:text="@{data.text}"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</layout>

@@ -8,5 +8,7 @@
 
     <string name="xunfei_id">597ee7bd</string>
     <string name="text_begin">请开始说话</string>
+    <string name="person_center">个人中心</string>
+    <string name="remind_record">说写日记</string>
 
 </resources>

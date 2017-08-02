@@ -2,6 +2,7 @@ package com.gkzxhn.gank_kotlin.api
 
 import android.app.Application
 import com.gkzxhn.gank_kotlin.R
+import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.di.component.ApiComponent
 import com.gkzxhn.gank_kotlin.di.component.DaggerApiComponent
 import com.gkzxhn.gank_kotlin.di.module.ApiModule
@@ -25,6 +26,8 @@ class App : Application() {
         SpeechUtility.createUtility(this, "appid=" + getString(R.string.xunfei_id))
 
         super.onCreate()
+
+        GreenDaoHelper.initDatabase()
 
         DaggerApiComponent.builder().apiModule(ApiModule()).appModule(AppModule(this)).build().inject(this)
     }
