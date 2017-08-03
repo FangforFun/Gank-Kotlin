@@ -1,7 +1,9 @@
 package com.gkzxhn.gank_kotlin.ui.activity
 
 import android.databinding.DataBindingUtil
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import com.gkzxhn.gank_kotlin.R
@@ -12,6 +14,8 @@ import com.gkzxhn.gank_kotlin.ui.adapter.RemindRecordAdapter
 import kotlinx.android.synthetic.main.activity_my_remind.*
 import org.greenrobot.greendao.rx.RxQuery
 import rx.android.schedulers.AndroidSchedulers
+
+
 
 
 /**
@@ -27,17 +31,24 @@ class MyRemindActivity : BaseActivity<ActivityMyRemindBinding>(){
 
     private lateinit var rxRemindDao : RxQuery<Remind>
 
+    private lateinit var mMediaPlayer: MediaPlayer
+
     private val mList =  ArrayList<Remind>()
 
     override fun initView() {
         rxRemindDao = GreenDaoHelper.getDaoSession().remindDao.queryBuilder().rx()
 
+        mMediaPlayer = MediaPlayer()
+
         setupToolbar(toolbar_remind)
 
-        mAdapter = RemindRecordAdapter(this, mList)
+        mAdapter = RemindRecordAdapter(this, mList, mMediaPlayer)
 
         rv_remind_record.layoutManager = LinearLayoutManager(this)
         rv_remind_record.adapter = mAdapter
+
+        val decoration = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
+        rv_remind_record.addItemDecoration(decoration)
 
         rxRemindDao.list()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -53,4 +64,8 @@ class MyRemindActivity : BaseActivity<ActivityMyRemindBinding>(){
         return DataBindingUtil.setContentView(this, R.layout.activity_my_remind)
     }
 
+    override fun onDestroy() {
+        mMediaPlayer.release()
+        super.onDestroy()
+    }
 }

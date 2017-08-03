@@ -19,6 +19,7 @@
         android:layout_height="88dp">
 
         <RelativeLayout
+            android:id="@+id/rl_time"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:layout_width="86dp"
@@ -29,6 +30,7 @@
                 android:textColor="@android:color/black"
                 android:visibility="@{DateUtil.isToOrYes(data.time)? View.VISIBLE : View.GONE}"
                 android:text="@{DateUtil.getToOrYesString(data.time)}"
+                android:textStyle="bold"
                 android:layout_width="match_parent"
                 android:layout_height="43dp"/>
 
@@ -37,6 +39,7 @@
                 android:visibility="@{DateUtil.isToOrYes(data.time) ? View.GONE : View.VISIBLE}"
                 android:text="@{DateUtil.getDayString(data.time)}"
                 android:textColor="@android:color/black"
+                android:textStyle="bold"
                 android:textSize="35sp"
                 android:layout_width="wrap_content"
                 android:layout_height="43dp"/>
@@ -48,23 +51,30 @@
                 android:textColor="@android:color/black"
                 android:text="@{DateUtil.getMonthString(data.time)}"
                 android:textSize="18sp"
+                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="22dp"/>
         </RelativeLayout>
 
         <TextView
-            android:layout_marginLeft="20dp"
-            android:maxLines="5"
+            android:layout_marginLeft="2dp"
+            android:paddingTop="5dp"
+            android:maxLines="4"
             android:minLines="1"
+            android:textColor="@android:color/black"
             android:text="@{data.content_detail}"
+            android:ellipsize="end"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"/>
 
         <ImageView
+            android:id="@+id/iv_play"
             android:layout_gravity="center_vertical"
+            app:srcCompat="@drawable/play"
+            android:clickable="true"
             android:layout_marginRight="16dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
+            android:layout_width="25dp"
+            android:layout_height="25dp"/>
     </LinearLayout>
 </layout>
