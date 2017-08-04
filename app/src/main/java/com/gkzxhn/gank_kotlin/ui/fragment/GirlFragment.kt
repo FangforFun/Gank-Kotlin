@@ -4,7 +4,9 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.gkzxhn.gank_kotlin.R
@@ -14,6 +16,7 @@ import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
 import com.gkzxhn.gank_kotlin.ui.adapter.PersonalListAdapter
 import com.gkzxhn.gank_kotlin.utils.JsonParser
+import com.gkzxhn.gank_kotlin.utils.PopupWindowUtil
 import com.iflytek.cloud.*
 import com.iflytek.cloud.ui.RecognizerDialog
 import com.iflytek.cloud.ui.RecognizerDialogListener
@@ -25,6 +28,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.io.File
 import java.util.*
 
 /**
@@ -54,6 +58,8 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
 
     private val mList = arrayListOf<PersonalInfo>()
 
+    private var remind: Remind? = null
+
     override fun initView() {
 
         rxRemindDao = GreenDaoHelper.getDaoSession().remindDao.rx()
@@ -71,12 +77,48 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         // 使用UI听写功能，请根据sdk文件目录下的notice.txt,放置布局文件和图片资源
         mIatDialog = RecognizerDialog(context, mInitListener)
 
+        tv_recognize.setOnClickListener {
+            v -> PopupWindowUtil.liveCommentEdit(activity, v,  { confirmed, comment ->
+            if (TextUtils.isEmpty(comment)) {
+                context.toast("您还未输入任何内容")
+                return@liveCommentEdit
+            }else {
+                tv_recognize.text = comment
+                if (remind == null) {
+                    remind = Remind()
+                    remind!!.content_detail = comment
+                    remind!!.time = System.currentTimeMillis()
+                    rxRemindDao.insert(remind)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                t -> Log.i(TAG, t.content_detail + t.id)
+                                tv_recognize.text = resources.getString(R.string.default_record_hint)
+                                remind = null
+                            },{
+                                e -> Log.e(TAG, e.message)
+                            })
+                }else {
+                    remind!!.content_detail = comment
+                    rxRemindDao.update(remind)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                t -> Log.i(TAG, t.content_detail + t.id)
+                                tv_recognize.text = resources.getString(R.string.default_record_hint)
+                                remind = null
+                            },{
+                                e -> Log.e(TAG, e.message)
+                            })
+                }
+            }
+        } )
+        }
+
         iat_recognize.setOnClickListener {
             //开始听写
             // 移动数据分析，收集开始听写事件
             FlowerCollector.onEvent(context, "iat_recognize")
 
-            et_recognize.setText(null)// 清空显示内容
+            tv_recognize.setText(null)// 清空显示内容
             mIatResults.clear()
             // 设置参数
             setParam()
@@ -150,7 +192,12 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mIat?.setParameter(SpeechConstant.AUDIO_FORMAT, "wav")
         time = System.currentTimeMillis()
-        path = Environment.getExternalStorageDirectory().toString() + "/msc/ $time .wav"
+        val dirString = Environment.getExternalStorageDirectory().toString() + "/msc/mykotlin"
+        val dir = File(dirString)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        path =  "$dirString / $time .wav"
         mIat?.setParameter(SpeechConstant.ASR_AUDIO_PATH, path)
         }
 
@@ -193,21 +240,23 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
             resultBuffer.append(mIatResults[key])
         }
 
-        et_recognize.setText(resultBuffer.toString())
-        et_recognize.setSelection(et_recognize.length())
+        tv_recognize.setTextColor(android.graphics.Color.BLACK)
+        tv_recognize.gravity = Gravity.CENTER_VERTICAL
+        tv_recognize.background = resources.getDrawable(R.drawable.record_selector)
+        tv_recognize.setText(resultBuffer.toString())
         Log.i(TAG, resultBuffer.toString())
 
         if (ls) {
-            val remind = Remind()
-            remind.time = time
-            remind.content_detail = resultBuffer.toString()
-            remind.voice_uri = path
+            remind = Remind()
+            remind!!.time = time
+            remind!!.content_detail = resultBuffer.toString()
+            remind!!.voice_uri = path
             rxRemindDao.insert(remind)
                     .subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        t -> context.toast(t.content_detail)
+                        t -> context.toast("已保存至\"说写日记\"")
                     }, {
                         e -> Log.i(TAG, e.message)
                     })

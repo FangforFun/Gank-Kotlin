@@ -72,6 +72,7 @@
             android:id="@+id/iv_play"
             android:layout_gravity="center_vertical"
             app:srcCompat="@drawable/play"
+            android:visibility="@{data.voice_uri==null?View.GONE:View.VISIBLE}"
             android:clickable="true"
             android:layout_marginRight="16dp"
             android:layout_width="25dp"

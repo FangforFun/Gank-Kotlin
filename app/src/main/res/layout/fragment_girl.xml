@@ -28,18 +28,23 @@
         android:layout_marginTop="10dp"
         android:id="@+id/rv_personal"
         android:layout_below="@+id/toolbar"
-        android:layout_above="@+id/et_recognize"
+        android:layout_above="@+id/tv_recognize"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
 
-    <EditText
-        android:id="@+id/et_recognize"
+    <TextView
+        android:id="@+id/tv_recognize"
         android:layout_above="@+id/iat_recognize"
-        android:lines="5"
-        android:layout_marginBottom="12dp"
-        android:hint="备忘?心情?纪念?统统写/说下来~"
+        android:minLines="1"
+        android:maxLines="3"
+        android:padding="12dp"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/default_record_hint"
+        android:gravity="center"
+        android:ellipsize="end"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

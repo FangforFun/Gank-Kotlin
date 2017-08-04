@@ -1,18 +1,24 @@
 package com.gkzxhn.gank_kotlin.ui.adapter
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.media.MediaPlayer
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.bean.entity.Remind
+import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.RemindRecordItemBinding
 import com.gkzxhn.gank_kotlin.utils.DateUtil
 import com.gkzxhn.gank_kotlin.utils.DateUtil.YMD_PATTERN
 import kotlinx.android.synthetic.main.remind_record_item.view.*
+import rx.android.schedulers.AndroidSchedulers
+import java.io.File
 
 
 /**
@@ -26,6 +32,8 @@ class RemindRecordAdapter(private var context: Context,
     private var changePosition: Int = -1
 
     private var playStatus: Boolean = false //上一个播放条目的播放状态
+
+    private val mRxDao = GreenDaoHelper.getDaoSession().remindDao.rx()
 
     override fun getItemCount(): Int {
         mediaPlayer.setOnCompletionListener {
@@ -90,7 +98,33 @@ class RemindRecordAdapter(private var context: Context,
         }
 
         holder.binding.root.setOnClickListener {
+            var builder = AlertDialog.Builder(context)
+            builder.setTitle("确定删除吗?")
+            builder.setMessage(remind.content_detail)
+            builder.setPositiveButton("确定", DialogInterface.OnClickListener { dialogInterface, i ->
+                mRxDao.delete(remind)
+                        .doOnSubscribe {
+                            arrayList.removeAt(position)
+                            if (!TextUtils.isEmpty(remind.voice_uri)) {
+                                val file = File(remind.voice_uri)
+                                if (file.exists()) {
+                                    file.delete()
+                                }
+                            }
+                        }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            dialogInterface.dismiss()
+                            notifyItemRemoved(position)
+                            notifyItemChanged(position)
+                        })
 
+            })
+            builder.setNegativeButton("取消", DialogInterface.OnClickListener { dialogInterface, i ->
+                dialogInterface.dismiss()
+            })
+            val dialog = builder.create()
+            dialog.show()
         }
    }
 
