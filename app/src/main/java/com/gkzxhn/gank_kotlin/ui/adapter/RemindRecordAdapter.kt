@@ -6,16 +6,17 @@ import android.content.DialogInterface
 import android.media.MediaPlayer
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.bean.entity.Remind
 import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.RemindRecordItemBinding
 import com.gkzxhn.gank_kotlin.utils.DateUtil
 import com.gkzxhn.gank_kotlin.utils.DateUtil.YMD_PATTERN
+import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.remind_record_item.view.*
 import rx.android.schedulers.AndroidSchedulers
 import java.io.File
@@ -27,20 +28,27 @@ import java.io.File
 class RemindRecordAdapter(private var context: Context,
                     private var arrayList: ArrayList<Remind>,
                           private var mediaPlayer: MediaPlayer) : RecyclerView.Adapter<RemindRecordAdapter.RemindRecordHolder>() {
+    val TAG = javaClass.simpleName
 
-    private var playPosition: Int = -1
-    private var changePosition: Int = -1
+    private var playPosition: Int = -1      //上一个播放按键被点击的position
+    private var changePosition: Int = -1    //需要变化播放UI的position
 
     private var playStatus: Boolean = false //上一个播放条目的播放状态
 
     private val mRxDao = GreenDaoHelper.getDaoSession().remindDao.rx()
 
+    private var mPlayStatusList = arrayListOf<Boolean>() //每个条目 对应的播放状态
+
     override fun getItemCount(): Int {
         mediaPlayer.setOnCompletionListener {
             mediaPlayer ->
+            mPlayStatusList.set(playPosition, false)
             playStatus = false
             changePosition = playPosition
             notifyItemChanged(playPosition)
+        }
+        for (i in arrayList.indices) {
+            mPlayStatusList.add(false)
         }
         return arrayList.size
     }
@@ -62,12 +70,13 @@ class RemindRecordAdapter(private var context: Context,
             holder.binding.root.rl_time.visibility = View.VISIBLE
         }
 
-        if (position == changePosition) {
-            if (playStatus) {
-                holder.binding.root.iv_play.setImageResource(R.drawable.pause)
-            }else {
-                holder.binding.root.iv_play.setImageResource(R.drawable.play)
-            }
+        //播放UI的处理
+
+        if (mPlayStatusList[position]) {
+            //当前条目正在播放
+            holder.binding.root.iv_play.setImageResource(R.drawable.pause)
+        }else {
+            holder.binding.root.iv_play.setImageResource(R.drawable.play)
         }
 
         holder.binding.root.iv_play.setOnClickListener {
@@ -76,35 +85,46 @@ class RemindRecordAdapter(private var context: Context,
             if (playPosition == position) {
                 if (!mediaPlayer.isPlaying) {
                     mediaPlayer.start()
-                    (v as ImageView).setImageResource(R.drawable.pause)
+                    mPlayStatusList.set(position, true)
+//                    (v as ImageView).setImageResource(R.drawable.pause)
                 } else {
                     mediaPlayer.pause()
-                    (v as ImageView).setImageResource(R.drawable.play)
+                    mPlayStatusList.set(position, false)
+//                    (v as ImageView).setImageResource(R.drawable.play)
                 }
             }else {
                 if (!mediaPlayer.isPlaying) {
-                    //表示上一个播放的是其他条目,并且现在没有播放
+                    //表示上一个播放的是其他条目或者没有点击,并且现在没有播放
                     start(remind.voice_uri)
-                    (v as ImageView).setImageResource(R.drawable.pause)
+                    mPlayStatusList.set(position, true)
+//                    (v as ImageView).setImageResource(R.drawable.pause)
                 }else {
                     start(remind.voice_uri)
+                    mPlayStatusList.set(position, true)
+                    mPlayStatusList.set(playPosition, false)
                     playStatus = false
                     changePosition = playPosition
-                    notifyItemChanged(playPosition)
-                    (v as ImageView).setImageResource(R.drawable.pause)
+                    notifyItemChanged(changePosition)
+//                    (v as ImageView).setImageResource(R.drawable.pause)
                 }
             }
+            notifyItemChanged(position)
             playPosition = position
         }
 
         holder.binding.root.setOnClickListener {
+            v ->
+            Log.i(TAG, "原来的位置---- $position " )
+            val clickPosition = holder.layoutPosition
+            Log.i(TAG, "当前点击的位置--- $clickPosition")
             var builder = AlertDialog.Builder(context)
             builder.setTitle("确定删除吗?")
             builder.setMessage(remind.content_detail)
             builder.setPositiveButton("确定", DialogInterface.OnClickListener { dialogInterface, i ->
                 mRxDao.delete(remind)
                         .doOnSubscribe {
-                            arrayList.removeAt(position)
+                            arrayList.removeAt(clickPosition)
+                            mPlayStatusList.removeAt(clickPosition)
                             if (!TextUtils.isEmpty(remind.voice_uri)) {
                                 val file = File(remind.voice_uri)
                                 if (file.exists()) {
@@ -115,8 +135,8 @@ class RemindRecordAdapter(private var context: Context,
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             dialogInterface.dismiss()
-                            notifyItemRemoved(position)
-                            notifyItemChanged(position)
+                            notifyItemRemoved(clickPosition)
+                            notifyItemChanged(clickPosition)
                         })
 
             })
@@ -135,6 +155,8 @@ class RemindRecordAdapter(private var context: Context,
             mediaPlayer.prepare()
             mediaPlayer.start()
         } catch(e: Exception) {
+            Log.e(TAG, "mediaPlayer---- " +e.message)
+            context.toast("资源不见鸟")
         }
     }
 
