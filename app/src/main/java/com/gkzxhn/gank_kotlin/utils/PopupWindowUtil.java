@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.IBinder;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -15,6 +14,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.gkzxhn.gank_kotlin.R;
+import com.gkzxhn.gank_kotlin.ui.wegit.BackEditText;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,10 +28,10 @@ public class PopupWindowUtil {
     public static PopupWindow commentPopup = null;
     public static String result = "";
     public static LiveCommentResult liveCommentResult = null;
-    public static EditText popup_live_comment_edit;
+    public static BackEditText popup_live_comment_edit;
     public static TextView popup_live_comment_send;
 
-    public static void liveCommentEdit(final Activity context, View view, LiveCommentResult commentResult) {
+    public static void liveCommentEdit(final Activity context, View view, final LiveCommentResult commentResult) {
         liveCommentResult = commentResult;
         if (commentView == null) {
             commentView = context.getLayoutInflater().inflate(R.layout.popup_live_comment, null);
@@ -53,22 +53,19 @@ public class PopupWindowUtil {
         // PopupWindow的显示及位置设置
         commentPopup.showAtLocation(view, Gravity.BOTTOM, 0, 0);
 
-        commentView.setFocusable(true);
-        commentView.setOnKeyListener(new View.OnKeyListener() {
+        popup_live_comment_edit = (BackEditText) commentView.findViewById(R.id.popup_live_comment_edit);
+        popup_live_comment_send = (TextView) commentView.findViewById(R.id.popup_live_comment_send);
+
+        popup_live_comment_edit.setFocusable(true);
+        popup_live_comment_edit.setFocusableInTouchMode(true);//设置view能够监听事件
+        popup_live_comment_edit.setBackListener(new BackEditText.BackListener() {
             @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (i == KeyEvent.KEYCODE_BACK && keyEvent.getRepeatCount() == 0){
-                    if (commentPopup.isShowing()) {
-                        commentPopup.dismiss();
-                    }
-                    return true;
+            public void back(TextView textView) {
+                if (commentPopup.isShowing()){
+                    commentPopup.dismiss();
                 }
-                return false;
             }
         });
-
-        popup_live_comment_edit = (EditText) commentView.findViewById(R.id.popup_live_comment_edit);
-        popup_live_comment_send = (TextView) commentView.findViewById(R.id.popup_live_comment_send);
 
         if (view instanceof TextView) {
             String s = ((TextView) (view)).getText().toString().trim();
@@ -108,12 +105,12 @@ public class PopupWindowUtil {
 
     private static void hideSoftInput(Activity context, IBinder windowToken) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(windowToken, 0); //强制隐藏键盘
+        imm.hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY); //强制隐藏键盘
     }
 
     private static void showKeyboard(Activity context, EditText popup_live_comment_edit) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(popup_live_comment_edit, InputMethodManager.SHOW_FORCED);
+        imm.showSoftInput(popup_live_comment_edit, InputMethodManager.SHOW_IMPLICIT);
     }
 
 

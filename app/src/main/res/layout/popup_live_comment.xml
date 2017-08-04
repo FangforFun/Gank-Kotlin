@@ -4,7 +4,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white">
 
-    <EditText
+    <com.gkzxhn.gank_kotlin.ui.wegit.BackEditText
         android:id="@+id/popup_live_comment_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,6 @@
         android:layout_toLeftOf="@+id/popup_live_comment_send"
         android:gravity="center_vertical"
         android:hint="说点什么吧"
-        android:imeOptions="actionNone"
         android:paddingLeft="6dp"
         android:ellipsize="end"
         android:paddingRight="6dp"
