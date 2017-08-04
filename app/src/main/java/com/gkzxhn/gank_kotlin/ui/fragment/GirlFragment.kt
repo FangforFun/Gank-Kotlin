@@ -65,7 +65,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         rxRemindDao = GreenDaoHelper.getDaoSession().remindDao.rx()
 
         rv_personal.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        mList.add(PersonalInfo(R.drawable.ic_empty_picture, resources.getString(R.string.remind_record)))
+        mList.add(PersonalInfo(R.drawable.remind_record, resources.getString(R.string.remind_record)))
         mAdapter = PersonalListAdapter(context, mList)
         rv_personal.adapter = mAdapter
 
@@ -92,6 +92,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 t -> Log.i(TAG, t.content_detail + t.id)
+                                context.toast(resources.getString(R.string.save2remind))
                                 tv_recognize.text = resources.getString(R.string.default_record_hint)
                                 remind = null
                             },{
@@ -103,6 +104,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 t -> Log.i(TAG, t.content_detail + t.id)
+                                context.toast(resources.getString(R.string.update2remind))
                                 tv_recognize.text = resources.getString(R.string.default_record_hint)
                                 remind = null
                             },{
@@ -256,7 +258,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        t -> context.toast("已保存至\"说写日记\"")
+                        t -> context.toast(resources.getString(R.string.save2remind))
                     }, {
                         e -> Log.i(TAG, e.message)
                     })

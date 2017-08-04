@@ -11,5 +11,7 @@
     <string name="person_center">个人中心</string>
     <string name="remind_record">说写日记</string>
     <string name="default_record_hint">备忘?心情?纪念?统统写/说下来~</string>
+    <string name="save2remind">\"已保存至\\\"说写日记\\\"\"</string>
+    <string name="update2remind">修改成功</string>
 
 </resources>

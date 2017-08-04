@@ -29,3 +29,8 @@ import com.gkzxhn.gank_kotlin.R
   @BindingAdapter("load_asset")
   fun loadAsset(imageView: ImageView, id:Int) =
           Glide.with(imageView.context).load(id).into(imageView)
+
+  @BindingAdapter("load_vector")
+  fun loadVector(imageView: ImageView, id:Int) =
+          imageView.setImageResource(id)
+

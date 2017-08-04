@@ -3,7 +3,6 @@ package com.gkzxhn.gank_kotlin.ui.activity
 import android.databinding.DataBindingUtil
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import com.gkzxhn.gank_kotlin.R
@@ -11,6 +10,7 @@ import com.gkzxhn.gank_kotlin.bean.entity.Remind
 import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.ActivityMyRemindBinding
 import com.gkzxhn.gank_kotlin.ui.adapter.RemindRecordAdapter
+import com.gkzxhn.gank_kotlin.ui.wegit.SpaceItemDecoration
 import kotlinx.android.synthetic.main.activity_my_remind.*
 import org.greenrobot.greendao.rx.RxQuery
 import rx.android.schedulers.AndroidSchedulers
@@ -47,7 +47,7 @@ class MyRemindActivity : BaseActivity<ActivityMyRemindBinding>(){
         rv_remind_record.layoutManager = LinearLayoutManager(this)
         rv_remind_record.adapter = mAdapter
 
-        val decoration = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
+        val decoration = SpaceItemDecoration(5, mList.size)
         rv_remind_record.addItemDecoration(decoration)
 
         rxRemindDao.list()
