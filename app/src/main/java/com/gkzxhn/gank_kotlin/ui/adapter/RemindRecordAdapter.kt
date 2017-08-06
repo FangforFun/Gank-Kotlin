@@ -33,8 +33,6 @@ class RemindRecordAdapter(private var context: Context,
     private var playPosition: Int = -1      //上一个播放按键被点击的position
     private var changePosition: Int = -1    //需要变化播放UI的position
 
-    private var playStatus: Boolean = false //上一个播放条目的播放状态
-
     private val mRxDao = GreenDaoHelper.getDaoSession().remindDao.rx()
 
     private var mPlayStatusList = arrayListOf<Boolean>() //每个条目 对应的播放状态
@@ -43,7 +41,6 @@ class RemindRecordAdapter(private var context: Context,
         mediaPlayer.setOnCompletionListener {
             mediaPlayer ->
             mPlayStatusList.set(playPosition, false)
-            playStatus = false
             changePosition = playPosition
             notifyItemChanged(playPosition)
         }
@@ -81,35 +78,31 @@ class RemindRecordAdapter(private var context: Context,
 
         holder.binding.root.iv_play.setOnClickListener {
             v ->
-            playStatus = true
-            if (playPosition == position) {
+            val clickPosition = holder.layoutPosition
+            val clickRemind = arrayList[clickPosition]
+            if (playPosition == clickPosition) {
                 if (!mediaPlayer.isPlaying) {
                     mediaPlayer.start()
-                    mPlayStatusList.set(position, true)
-//                    (v as ImageView).setImageResource(R.drawable.pause)
+                    mPlayStatusList.set(clickPosition, true)
                 } else {
                     mediaPlayer.pause()
-                    mPlayStatusList.set(position, false)
-//                    (v as ImageView).setImageResource(R.drawable.play)
+                    mPlayStatusList.set(clickPosition, false)
                 }
             }else {
                 if (!mediaPlayer.isPlaying) {
                     //表示上一个播放的是其他条目或者没有点击,并且现在没有播放
-                    start(remind.voice_uri)
-                    mPlayStatusList.set(position, true)
-//                    (v as ImageView).setImageResource(R.drawable.pause)
+                    start(clickRemind.voice_uri)
+                    mPlayStatusList.set(clickPosition, true)
                 }else {
-                    start(remind.voice_uri)
-                    mPlayStatusList.set(position, true)
+                    start(clickRemind.voice_uri)
+                    mPlayStatusList.set(clickPosition, true)
                     mPlayStatusList.set(playPosition, false)
-                    playStatus = false
                     changePosition = playPosition
                     notifyItemChanged(changePosition)
-//                    (v as ImageView).setImageResource(R.drawable.pause)
                 }
             }
-            notifyItemChanged(position)
-            playPosition = position
+            notifyItemChanged(clickPosition)
+            playPosition = clickPosition
         }
 
         holder.binding.root.setOnClickListener {
@@ -124,6 +117,14 @@ class RemindRecordAdapter(private var context: Context,
                 mRxDao.delete(remind)
                         .doOnSubscribe {
                             arrayList.removeAt(clickPosition)
+                            if (mPlayStatusList[clickPosition]) {
+                                //当前删除条目正在播放
+                                 //删掉之后,上一个播放的位置改为-1
+                                playPosition = -1
+                                if (mediaPlayer.isPlaying) {
+                                    mediaPlayer.stop()
+                                }
+                            }
                             mPlayStatusList.removeAt(clickPosition)
                             if (!TextUtils.isEmpty(remind.voice_uri)) {
                                 val file = File(remind.voice_uri)
