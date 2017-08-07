@@ -23,6 +23,9 @@
         android:roundIcon="@mipmap/g"
         android:supportsRtl="true"
         android:theme="@style/Theme.DesignDemo">
+
+        <meta-data android:name="IFLYTEK_APPKEY" android:value="'597ee7bd'"> </meta-data>
+
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +55,19 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".ui.activity.MyRemindActivity"
                   android:screenOrientation="portrait"/>
+
+
+        <activity android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:name="com.iflytek.autoupdate.IFlytekUpdateDialog"
+                  android:windowSoftInputMode="stateAlwaysHidden"
+                  android:screenOrientation="portrait"
+                  android:exported="true"
+                  android:configChanges="keyboard|keyboardHidden|orientation"/>
+
+        <!-- 下载基础服务 -->
+        <service android:name="com.iflytek.autoupdate.IFlytekDownloadService"
+                 android:process=":IFlytekDownloadService"
+                 android:enabled="true"/>
     </application>
 
 </manifest>
