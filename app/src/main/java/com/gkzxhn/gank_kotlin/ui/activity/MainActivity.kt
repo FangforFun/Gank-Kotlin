@@ -123,9 +123,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         // 启动自动更新
         updManager.autoUpdate(this, { errorCode, updateInfo ->
             Log.i(TAG, "errorCode $errorCode")
-            Log.i(TAG, "updateInfo Url ${updateInfo.downloadUrl}")
-            Log.i(TAG, "updateInfo Version ${updateInfo.updateVersionCode}")
             if(errorCode == UpdateErrorCode.OK && updateInfo!= null) {
+                Log.i(TAG, "updateInfo Url ${updateInfo.downloadUrl}")
+                Log.i(TAG, "updateInfo Version ${updateInfo.updateVersionCode}")
                 if(updateInfo.getUpdateType() == UpdateType.NoNeed) {
                     return@autoUpdate
                 }
