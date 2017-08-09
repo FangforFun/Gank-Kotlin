@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.databinding.DataBindingUtil
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +14,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget
 import com.gkzxhn.gank_kotlin.R
 import com.gkzxhn.gank_kotlin.bean.info.VideoBean
 import com.gkzxhn.gank_kotlin.databinding.ActivityVideoDetailBinding
@@ -24,6 +29,7 @@ import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import kotlinx.android.synthetic.main.activity_video_detail.*
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.lang.Exception
 import java.util.concurrent.ExecutionException
 
 /**
@@ -72,7 +78,30 @@ class VideoDetailActivity : BaseActivity<ActivityVideoDetailBinding>() {
         //增加封面
         imageView = ImageView(this)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        ImageViewAsyncTask(mHandler, this, imageView).execute(videoBean.feed)
+//        ImageViewAsyncTask(mHandler, this, imageView).execute(videoBean.feed)
+
+        Glide.with(imageView.context).load(videoBean.feed)
+                /*.asBitmap()
+                .format(DecodeFormat.PREFER_ARGB_8888)*/
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .placeholder(R.drawable.ic_image_loading)
+                .error(R.drawable.ic_empty_picture)
+                .into(object : GlideDrawableImageViewTarget(imageView){
+                    override fun onResourceReady(resource: GlideDrawable?, animation: GlideAnimation<in GlideDrawable>?) {
+                        super.onResourceReady(resource, animation)
+                        gsy_player.setThumbImageView(imageView)
+                    }
+
+                    override fun onLoadFailed(e: Exception?, errorDrawable: Drawable?) {
+                        super.onLoadFailed(e, errorDrawable)
+                        Log.e(TAG, e.toString())
+                        imageView.setImageDrawable(errorDrawable)
+                        gsy_player.setThumbImageView(imageView)
+                    }
+                })
+
+
         gsy_player.titleTextView.visibility = View.GONE
         gsy_player.backButton.visibility = View.VISIBLE
         orientationUtils = OrientationUtils(this, gsy_player)
@@ -126,10 +155,10 @@ class VideoDetailActivity : BaseActivity<ActivityVideoDetailBinding>() {
         private var mIs: FileInputStream? = null
         private var mActivity: VideoDetailActivity = activity
         override fun doInBackground(vararg params: String): String? {
+            try {
             val future = Glide.with(mActivity)
                     .load(params[0])
                     .downloadOnly(100, 100)
-            try {
                 val cacheFile = future.get()
                 mPath = cacheFile.absolutePath
             } catch (e: InterruptedException) {
@@ -137,7 +166,6 @@ class VideoDetailActivity : BaseActivity<ActivityVideoDetailBinding>() {
             } catch (e: ExecutionException) {
                 e.printStackTrace()
             }
-
             return mPath
         }
 

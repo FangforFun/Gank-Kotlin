@@ -88,21 +88,11 @@ class RemindRecordAdapter(private var context: Context,
                     mediaPlayer.pause()
                     mPlayStatusList.set(clickPosition, false)
                 }
+                notifyItemChanged(clickPosition)
+                playPosition = clickPosition
             }else {
-                if (!mediaPlayer.isPlaying) {
-                    //表示上一个播放的是其他条目或者没有点击,并且现在没有播放
-                    start(clickRemind.voice_uri)
-                    mPlayStatusList.set(clickPosition, true)
-                }else {
-                    start(clickRemind.voice_uri)
-                    mPlayStatusList.set(clickPosition, true)
-                    mPlayStatusList.set(playPosition, false)
-                    changePosition = playPosition
-                    notifyItemChanged(changePosition)
-                }
+                start(clickRemind.voice_uri, clickPosition, mediaPlayer.isPlaying)
             }
-            notifyItemChanged(clickPosition)
-            playPosition = clickPosition
         }
 
         holder.binding.root.setOnClickListener {
@@ -132,6 +122,10 @@ class RemindRecordAdapter(private var context: Context,
                                     file.delete()
                                 }
                             }
+
+                            if (mOnDeleteListener != null) {
+                                mOnDeleteListener.onDelete(clickPosition)
+                            }
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -149,12 +143,20 @@ class RemindRecordAdapter(private var context: Context,
         }
    }
 
-    private fun start(voice_uri: String?) {
+    private fun start(voice_uri: String?, clickPosition: Int, isPlaying: Boolean) {
         mediaPlayer.reset()
         try {
             mediaPlayer.setDataSource(voice_uri)
             mediaPlayer.prepare()
             mediaPlayer.start()
+            notifyItemChanged(clickPosition)
+            mPlayStatusList.set(clickPosition, true)
+            if (isPlaying) {
+                mPlayStatusList.set(playPosition, false)
+                changePosition = playPosition
+                notifyItemChanged(changePosition)
+            }
+            playPosition = clickPosition
         } catch(e: Exception) {
             Log.e(TAG, "mediaPlayer---- " +e.message)
             context.toast("资源不见鸟")
@@ -166,7 +168,15 @@ class RemindRecordAdapter(private var context: Context,
         return RemindRecordHolder(binding)
     }
 
-    class RemindRecordHolder(val binding: RemindRecordItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class RemindRecordHolder(val binding: RemindRecordItemBinding) : RecyclerView.ViewHolder(binding.root)
 
+    interface onDeleteListener{
+        fun onDelete(position: Int)
+    }
+
+    private lateinit var mOnDeleteListener: onDeleteListener
+
+    fun setOnDeleteListener(listener: onDeleteListener){
+        mOnDeleteListener = listener
     }
 }

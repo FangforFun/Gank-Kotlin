@@ -1,6 +1,7 @@
 package com.gkzxhn.gank_kotlin.ui.fragment
 
 import android.databinding.DataBindingUtil
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.widget.LinearLayoutManager
@@ -17,6 +18,8 @@ import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
 import com.gkzxhn.gank_kotlin.ui.adapter.PersonalListAdapter
 import com.gkzxhn.gank_kotlin.utils.JsonParser
 import com.gkzxhn.gank_kotlin.utils.PopupWindowUtil
+import com.gkzxhn.gank_kotlin.utils.rxbus.DeleteEvent
+import com.gkzxhn.gank_kotlin.utils.rxbus.RxBus
 import com.iflytek.cloud.*
 import com.iflytek.cloud.ui.RecognizerDialog
 import com.iflytek.cloud.ui.RecognizerDialogListener
@@ -26,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_girl.*
 import org.greenrobot.greendao.rx.RxDao
 import org.json.JSONException
 import org.json.JSONObject
+import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.File
@@ -50,6 +54,10 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
 
     private lateinit var rxRemindDao : RxDao<Remind, Long>
 
+    private lateinit var mBus: RxBus
+
+    private lateinit var mSubscription: Subscription
+
     private lateinit var path : String
 
     private var time: Long = 0L
@@ -63,6 +71,8 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
     override fun initView() {
 
         rxRemindDao = GreenDaoHelper.getDaoSession().remindDao.rx()
+
+        mBus = RxBus.instance
 
         rv_personal.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         mList.add(PersonalInfo(R.drawable.remind_record, resources.getString(R.string.remind_record)))
@@ -129,9 +139,21 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
             mIatDialog!!.show()
             context.toast(getString(R.string.text_begin))
         }
+
+        mSubscription =
+                mBus.toObservable(DeleteEvent::class.java)
+                .subscribe({
+                    s -> remind = null
+                    tv_recognize.text = resources.getString(R.string.default_record_hint)
+                },{
+                    e -> Log.i(TAG, e.message)
+                })
     }
 
     override fun onDestroy() {
+        if (mSubscription != null) {
+            mSubscription.unsubscribe()
+        }
         super.onDestroy()
     }
 
@@ -194,12 +216,12 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mIat?.setParameter(SpeechConstant.AUDIO_FORMAT, "wav")
         time = System.currentTimeMillis()
-        val dirString = Environment.getExternalStorageDirectory().toString() + "/msc/mykotlin"
+        val dirString = Environment.getExternalStorageDirectory().toString() + "/msc/mykotlin/"
         val dir = File(dirString)
         if (!dir.exists()) {
             dir.mkdirs()
         }
-        path =  "$dirString / $time .wav"
+        path =  "$dirString $time .wav"
         mIat?.setParameter(SpeechConstant.ASR_AUDIO_PATH, path)
         }
 
@@ -242,7 +264,7 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
             resultBuffer.append(mIatResults[key])
         }
 
-        tv_recognize.setTextColor(android.graphics.Color.BLACK)
+        tv_recognize.setTextColor(Color.BLACK)
         tv_recognize.gravity = Gravity.CENTER_VERTICAL
         tv_recognize.background = resources.getDrawable(R.drawable.record_selector)
         tv_recognize.setText(resultBuffer.toString())
