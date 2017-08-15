@@ -13,11 +13,11 @@ import com.gkzxhn.gank_kotlin.databinding.ActivityMainBinding
 import com.gkzxhn.gank_kotlin.ui.fragment.AndroidFragment
 import com.gkzxhn.gank_kotlin.ui.fragment.GirlFragment
 import com.gkzxhn.gank_kotlin.ui.fragment.ShipinFragment
+import com.gkzxhn.gank_kotlin.utils.AppUtils
 import com.gkzxhn.gank_kotlin.utils.PermissionsChecker
 import com.iflytek.autoupdate.IFlytekUpdate
 import com.iflytek.autoupdate.UpdateConstants
 import com.iflytek.autoupdate.UpdateErrorCode
-import com.iflytek.autoupdate.UpdateType
 import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -126,7 +126,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             if(errorCode == UpdateErrorCode.OK && updateInfo!= null) {
                 Log.i(TAG, "updateInfo Url ${updateInfo.downloadUrl}")
                 Log.i(TAG, "updateInfo Version ${updateInfo.updateVersionCode}")
-                if(updateInfo.getUpdateType() == UpdateType.NoNeed) {
+                val versionCode = AppUtils.getVersionCode(this)
+                if(updateInfo.updateVersionCode == versionCode.toString()) {
                     return@autoUpdate
                 }
                 updManager.showUpdateInfo(this, updateInfo);
