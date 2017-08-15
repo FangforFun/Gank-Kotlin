@@ -1,11 +1,13 @@
 package com.gkzxhn.gank_kotlin.ui.fragment
 
 import android.databinding.DataBindingUtil
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +15,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
 import com.gkzxhn.gank_kotlin.R
+import com.gkzxhn.gank_kotlin.bean.info.BitmapTemp
 import com.gkzxhn.gank_kotlin.databinding.FragmentAndroidBinding
 import com.gkzxhn.gank_kotlin.di.component.GankModule
 import com.gkzxhn.gank_kotlin.mvp.contract.GankContract
@@ -33,6 +39,7 @@ import javax.inject.Inject
  *
  */
 class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(){
+    val TAG = javaClass.simpleName
 
     @Inject lateinit var mPresenter: GankPresenter
     private val INTERPOLATOR = FastOutSlowInInterpolator()
@@ -51,6 +58,7 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
         setSearchView()
         fab.setOnClickListener {
             view ->
+            BitmapTemp.bitmaps.clear()
             mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
             context.toast("看看手气~")
         }
@@ -149,8 +157,35 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
                     }
                     Glide.with(imageView.context)
                             .load(url)
-                            .crossFade()
-                            .into(imageView)
+                            .asBitmap()//强制Glide返回一个Bitmap对象
+                            /*.listener(object: RequestListener<String, Bitmap> {
+                                override fun onResourceReady(resource: Bitmap?, model: String?, target: Target<Bitmap>?,
+                                                             isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                    val width = resource!!.getWidth()
+                                    val height = resource.getHeight()
+                                    Log.d(TAG, "width2 " + width) //400px
+                                    Log.d(TAG, "height2 " + height) //400px
+                                    Log.d(TAG, "index " + index) //400px
+                                    BitmapTemp.bitmaps.put(index, resource)
+                                    return false
+                                }
+
+                                override fun onException(e: Exception?, model: String?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
+                                    Log.d(TAG, "onException " + e.toString())
+                                    return false
+                                }
+                            })*/
+                            .into(object : SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL){
+                                override fun onResourceReady(resource: Bitmap?, glideAnimation: GlideAnimation<in Bitmap>?) {
+                                    val width = resource!!.getWidth()
+                                    val height = resource.getHeight()
+                                    Log.d(TAG, "width2 " + width) //400px
+                                    Log.d(TAG, "height2 " + height) //400px
+                                    Log.d(TAG, "index " + index) //400px
+                                    imageView.setImageBitmap(resource)
+                                    BitmapTemp.bitmaps.put(index, resource)
+                                }
+                            })
                     imageViewList.add(imageView)
                 }
                 viewpager.adapter = MyPhotoPagerAdapter(imageViewList)

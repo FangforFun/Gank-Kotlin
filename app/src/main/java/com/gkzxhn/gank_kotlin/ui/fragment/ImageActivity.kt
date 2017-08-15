@@ -7,6 +7,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -14,13 +15,16 @@ import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
 import com.gkzxhn.gank_kotlin.R
+import com.gkzxhn.gank_kotlin.bean.info.BitmapTemp
 import com.gkzxhn.gank_kotlin.databinding.ActivityImageBinding
 import com.gkzxhn.gank_kotlin.ui.activity.BaseActivity
 import com.gkzxhn.gank_kotlin.ui.adapter.MyPhotoPagerAdapter
 import com.gkzxhn.gank_kotlin.ui.wegit.MyDragPhotoView
 import kotlinx.android.synthetic.main.activity_image.*
-
 
 
 
@@ -48,6 +52,7 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
     private var mScaleY: Float = 0.toFloat()
     private var mTranslationX: Float = 0.toFloat()
     private var mTranslationY: Float = 0.toFloat()
+    private var scale: Float = 0.toFloat()
 
     private val mPhotoViews = arrayListOf<ImageView>()
 
@@ -55,21 +60,60 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
     override fun initView() {
 //        mBinding.url = intent.getStringExtra(IMG)
         urls = intent.getStringArrayListExtra(IMG)
+
         val index = intent.getIntExtra(INDEX, 0)
-        for (url in urls) {
+        for (i in urls.indices) {
             val imageView = MyDragPhotoView(this)
             imageView.transitionName = "img"
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER)
             imageView.isClickable = true
             imageView.setOnTapListener { finishWithAnimation() }
-            imageView.setOnExitListener { var1, var2, var3, var4, var5 ->
-                performExitAnimation(var1, var2, var3, var4, var5)
+            imageView.setOnExitListener { var1, var2, var3, var4, var5, var6 ->
+                performExitAnimation(var1, var2, var3, var4, var5, var6)
             }
-            Glide.with(imageView.context)
-                    .load(url)
-                    .error(R.drawable.error_photo)
-                    .crossFade()
-                    .into(imageView)
+            if (index == -1 && i == 0) {
+                if (null!= BitmapTemp.bitmaps[index]) {
+                    imageView.setImageBitmap(BitmapTemp.bitmaps[index])
+                }else {
+                    Glide.with(imageView.context)
+                            .load(urls[i])
+                            .asBitmap()//强制Glide返回一个Bitmap对象
+                            .error(R.drawable.error_photo)
+                            .into(object : SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL){
+                                override fun onResourceReady(resource: Bitmap?, glideAnimation: GlideAnimation<in Bitmap>?) {
+                                    val width = resource!!.getWidth()
+                                    val height = resource.getHeight()
+                                    Log.d(TAG, "width2 " + width) //400px
+                                    Log.d(TAG, "height2 " + height) //400px
+                                    Log.d(TAG, "index " + index) //400px
+                                    imageView.setImageBitmap(resource)
+                                    BitmapTemp.bitmaps.put(index, resource)
+                                    getScaled(resource)
+                                }
+                            })
+                }
+            }else if (null!= BitmapTemp.bitmaps[i]) {
+                imageView.setImageBitmap(BitmapTemp.bitmaps[i])
+            }else {
+                Glide.with(imageView.context)
+                        .load(urls[i])
+                        .asBitmap()//强制Glide返回一个Bitmap对象
+                        .error(R.drawable.error_photo)
+                        .into(object : SimpleTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL){
+                            override fun onResourceReady(resource: Bitmap?, glideAnimation: GlideAnimation<in Bitmap>?) {
+                                val width = resource!!.getWidth()
+                                val height = resource.getHeight()
+                                Log.d(TAG, "width2 " + width) //400px
+                                Log.d(TAG, "height2 " + height) //400px
+                                Log.d(TAG, "index " + index) //400px
+                                imageView.setImageBitmap(resource)
+                                BitmapTemp.bitmaps.put(index, resource)
+                                if (i == viewpager_photo.currentItem) {
+                                    getScaled(resource)
+                                }
+                            }
+                        })
+            }
             mPhotoViews.add(imageView)
         }
         viewpager_photo.adapter = MyPhotoPagerAdapter(mPhotoViews)
@@ -84,6 +128,7 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         mOriginTop = intent.getIntExtra("top", 0)
                         mOriginHeight = intent.getIntExtra("height", 0)
                         mOriginWidth = intent.getIntExtra("width", 0)
+
                         mOriginCenterX = mOriginLeft + mOriginWidth / 2
                         mOriginCenterY = mOriginTop + mOriginHeight / 2
 
@@ -107,8 +152,13 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         photoView.setTranslationX(mTranslationX)
                         photoView.setTranslationY(mTranslationY)
 
-                        photoView.setScaleX(mScaleX)
-                        photoView.setScaleY(mScaleY)
+                        val bitmap = BitmapTemp.bitmaps[viewpager_photo.currentItem]
+                        if (bitmap != null) {
+                            getScaled(bitmap)
+                        }
+
+//                        photoView.setScaleX(mScaleX)
+//                        photoView.setScaleY(mScaleY)
 
                         performEnterAnimation()
 
@@ -117,6 +167,31 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         }*/
                     }
                 })
+    }
+
+    /**
+     * 得到缩放比例
+     */
+    private fun getScaled(bitmap: Bitmap?) {
+        val realW2h = bitmap!!.width / bitmap.height.toFloat()
+        val originW2h = mOriginWidth / mOriginHeight.toFloat()
+        val targetW2h = mTargetWidth / mTargetHeight
+        //centercrop如果控件的宽高比大于图片的宽高比,那么控件的宽度就等于图片的宽度
+        if (originW2h >= realW2h) {
+            if (targetW2h <= realW2h) {
+                //fitCenter如果控件的宽高比小于图片的宽高比,那么控件的宽度就等于图片的宽度
+                scale = mOriginWidth / mTargetWidth
+            } else {
+                scale = mOriginWidth / mTargetHeight / realW2h
+            }
+        } else {
+            if (targetW2h <= realW2h) {
+                scale = mOriginHeight / mTargetWidth * realW2h
+            } else {
+                scale = mOriginHeight / mTargetHeight
+            }
+        }
+        Log.i(TAG, "scale:  $scale")
     }
 
     override fun createDataBinding(savedInstanceState: Bundle?): ActivityImageBinding {
@@ -133,10 +208,10 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
             val location = intArrayOf(0, 1)
             imageView.getLocationOnScreen(location)
-            intent.putExtra("left", location[0]);
-            intent.putExtra("top", location[1]);
-            intent.putExtra("height", imageView.getHeight());
-            intent.putExtra("width", imageView.getWidth());
+            intent.putExtra("left", location[0])
+            intent.putExtra("top", location[1])
+            intent.putExtra("height", imageView.getHeight())
+            intent.putExtra("width", imageView.getWidth())
             if(Build.VERSION.SDK_INT > 21) {
                 context.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(context as Activity, imageView, "img").toBundle())
             }else{
@@ -146,51 +221,30 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
         }
     }
 
+    private val DURATION = 200L //动画时长
+
     /**
-     *
+     * 拖拽关闭界面的动画效果
      */
-    private fun performExitAnimation(view: MyDragPhotoView, x: Float, y: Float, w: Float, h: Float) {
+    private fun performExitAnimation(view: MyDragPhotoView, x: Float, y: Float, w: Float, h: Float, alpha: Int) {
         Log.i(TAG, "traslateX : " + x)
         Log.i(TAG, "traslateY : " + y)
         Log.i(TAG, "width : " + w)
         Log.i(TAG, "height : " + h)
+        Log.i(TAG, "height : " + h)
+        Log.i(TAG, "alpha : " + alpha)
 
 //        view.finishAnimationCallBack()
-        val viewX = mTargetWidth / 2 + x - /*mTargetWidth * mScaleX*/w / 2
-        val viewY = mTargetHeight / 2 + y -/* mTargetHeight * mScaleY */h/ 2
-//        view.x = viewX
-//        view.y = viewY
 
-        val centerX = view.x + mOriginWidth / 2
-        val centerY = view.y + mOriginHeight / 2
-
-        val translateX = mOriginCenterX - centerX
-        val translateY = mOriginCenterY - centerY
-
-        val scaleX = view.scaleX
-        val scaleY = view.scaleY
-
-        val scaleXAnimator = ValueAnimator.ofFloat(view.getmScale(),  mOriginWidth/mTargetWidth)
-        scaleXAnimator.addUpdateListener { valueAnimator ->
-            view.scaleX = valueAnimator.animatedValue as Float }
-        scaleXAnimator.duration = 300
-        scaleXAnimator.start()
-        val scaleYAnimator = ValueAnimator.ofFloat(view.getmScale(),  mOriginHeight/mTargetHeight)
-        scaleYAnimator.addUpdateListener { valueAnimator ->
-            view.scaleY = valueAnimator.animatedValue as Float }
-        scaleYAnimator.duration = 300
-        scaleYAnimator.start()
-
-        val translateXAnimator = ValueAnimator.ofFloat(x, 0f)
+        val translateXAnimator = ValueAnimator.ofFloat(x, mTranslationX)
         translateXAnimator.addUpdateListener { valueAnimator ->
-            view.x = valueAnimator.animatedValue as Float }
-        translateXAnimator.duration = 300
+            view.translateX = valueAnimator.animatedValue as Float }
+        translateXAnimator.duration = DURATION
         translateXAnimator.start()
-        val translateYAnimator = ValueAnimator.ofFloat(y - (1 - view.getmScale()) * mTargetHeight / 2,
-                mOriginTop.toFloat() + mOriginHeight.toFloat() / 2 - mTargetHeight / 2)
+        val translateYAnimator = ValueAnimator.ofFloat(y, mTranslationY)
         translateYAnimator.addUpdateListener { valueAnimator ->
-            view.y = valueAnimator.animatedValue as Float }
-        scaleYAnimator.addListener(object : Animator.AnimatorListener {
+            view.translateY = valueAnimator.animatedValue as Float }
+        translateYAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animator: Animator) {
 
             }
@@ -209,32 +263,49 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
             }
         })
-        translateYAnimator.duration = 300
+        translateYAnimator.duration = DURATION
         translateYAnimator.start()
+
+        val alphaAnimator = ValueAnimator.ofInt(alpha, 0)
+        alphaAnimator.addUpdateListener { valueAnimator ->
+            view.setMAlpha(valueAnimator.animatedValue as Int)
+        }
+        alphaAnimator.duration = DURATION
+        alphaAnimator.start()
+
+        val scaleAnimator = ValueAnimator.ofFloat(view.getmScale(), scale)
+        scaleAnimator.addUpdateListener { valueAnimator ->
+            view.setmScale(valueAnimator.animatedValue as Float)
+        }
+        scaleAnimator.duration = DURATION
+        scaleAnimator.start()
     }
 
     private fun finishWithAnimation() {
 
-        val photoView = mPhotoViews[viewpager_photo.currentItem]
+        val photoView = mPhotoViews[viewpager_photo.currentItem] as MyDragPhotoView
         val translateXAnimator = ValueAnimator.ofFloat(0f, mTranslationX)
         translateXAnimator.addUpdateListener { valueAnimator -> photoView.setX(valueAnimator.animatedValue as Float) }
-        translateXAnimator.duration = 300
+        translateXAnimator.duration = DURATION
         translateXAnimator.start()
 
         val translateYAnimator = ValueAnimator.ofFloat(0f, mTranslationY)
         translateYAnimator.addUpdateListener { valueAnimator -> photoView.setY(valueAnimator.animatedValue as Float) }
-        translateYAnimator.duration = 300
+        translateYAnimator.duration = DURATION
         translateYAnimator.start()
 
-        val scaleYAnimator = ValueAnimator.ofFloat(1f, mScaleY)
-        scaleYAnimator.addUpdateListener { valueAnimator -> photoView.setScaleY(valueAnimator.animatedValue as Float) }
-        scaleYAnimator.duration = 300
-        scaleYAnimator.start()
+        val scaleAnimator = ValueAnimator.ofFloat(1f, scale)
+        scaleAnimator.addUpdateListener { valueAnimator ->
+            photoView.setmScale(valueAnimator.animatedValue as Float)
+        }
+        scaleAnimator.duration = DURATION
+        scaleAnimator.start()
 
-        val scaleXAnimator = ValueAnimator.ofFloat(1f, mScaleX)
-        scaleXAnimator.addUpdateListener { valueAnimator -> photoView.setScaleX(valueAnimator.animatedValue as Float) }
-
-        scaleXAnimator.addListener(object : Animator.AnimatorListener {
+        val alphaAnimator = ValueAnimator.ofInt(255, 0)
+        alphaAnimator.addUpdateListener { valueAnimator ->
+            photoView.setMAlpha(valueAnimator.animatedValue as Int)
+        }
+        alphaAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animator: Animator) {
 
             }
@@ -253,30 +324,30 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
             }
         })
-        scaleXAnimator.duration = 300
-        scaleXAnimator.start()
+        alphaAnimator.duration = DURATION
+        alphaAnimator.start()
     }
 
     private fun performEnterAnimation() {
         val photoView = mPhotoViews[viewpager_photo.currentItem]
         val translateXAnimator = ValueAnimator.ofFloat(photoView.getX(), 0f)
         translateXAnimator.addUpdateListener { valueAnimator -> photoView.setX(valueAnimator.animatedValue as Float) }
-        translateXAnimator.duration = 300
+        translateXAnimator.duration = DURATION
         translateXAnimator.start()
 
         val translateYAnimator = ValueAnimator.ofFloat(photoView.getY(), 0f)
         translateYAnimator.addUpdateListener { valueAnimator -> photoView.setY(valueAnimator.animatedValue as Float) }
-        translateYAnimator.duration = 300
+        translateYAnimator.duration = DURATION
         translateYAnimator.start()
 
         val scaleYAnimator = ValueAnimator.ofFloat(mScaleY, 1f)
         scaleYAnimator.addUpdateListener { valueAnimator -> photoView.setScaleY(valueAnimator.animatedValue as Float) }
-        scaleYAnimator.duration = 300
+        scaleYAnimator.duration = DURATION
         scaleYAnimator.start()
 
         val scaleXAnimator = ValueAnimator.ofFloat(mScaleX, 1f)
         scaleXAnimator.addUpdateListener { valueAnimator -> photoView.setScaleX(valueAnimator.animatedValue as Float) }
-        scaleXAnimator.duration = 300
+        scaleXAnimator.duration = DURATION
         scaleXAnimator.start()
     }
 

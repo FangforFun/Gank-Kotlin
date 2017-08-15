@@ -165,7 +165,7 @@ public class MyDragPhotoView extends PhotoView{
                 throw new RuntimeException("DragPhotoView: onExitLister can\'t be null ! call setOnExitListener() ");
             }
 
-            this.mExitListener.onExit(this, this.mTranslateX, this.mTranslateY, (float)this.mWidth, (float)this.mHeight);
+            this.mExitListener.onExit(this, this.mTranslateX, this.mTranslateY, (float)this.mWidth, (float)this.mHeight, this.mAlpha);
         } else {
             this.performAnimation();
         }
@@ -297,7 +297,7 @@ public class MyDragPhotoView extends PhotoView{
     }
 
     public interface OnExitListener {
-        void onExit(MyDragPhotoView var1, float var2, float var3, float var4, float var5);
+        void onExit(MyDragPhotoView var1, float var2, float var3, float var4, float var5, int alpha);
     }
 
     public interface OnTapListener {
@@ -310,5 +310,26 @@ public class MyDragPhotoView extends PhotoView{
 
     public void setmScale(float scale) {
         mScale = scale;
+    }
+
+    public void setMAlpha(int alpha) {
+        mAlpha = alpha;
+        invalidate();
+    }
+
+    public float getTranslateY() {
+        return mTranslateY;
+    }
+
+    public void setTranslateY(float translateY) {
+        mTranslateY = translateY;
+    }
+
+    public float getTranslateX() {
+        return mTranslateX;
+    }
+
+    public void setTranslateX(float translateX) {
+        mTranslateX = translateX;
     }
 }
