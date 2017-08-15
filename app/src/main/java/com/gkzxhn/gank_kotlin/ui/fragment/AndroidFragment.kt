@@ -26,10 +26,13 @@ import com.gkzxhn.gank_kotlin.mvp.contract.GankContract
 import com.gkzxhn.gank_kotlin.mvp.presenter.GankPresenter
 import com.gkzxhn.gank_kotlin.ui.adapter.MyPhotoPagerAdapter
 import com.gkzxhn.gank_kotlin.ui.adapter.MyRvAdapter
+import com.gkzxhn.gank_kotlin.utils.rxbus.PageChangedEvent
+import com.gkzxhn.gank_kotlin.utils.rxbus.RxBus
 import com.wingsofts.gankclient.bean.FuckGoods
 import com.wingsofts.gankclient.getMainComponent
 import com.wingsofts.gankclient.toast
 import kotlinx.android.synthetic.main.fragment_android.*
+import rx.Subscription
 import java.util.*
 import javax.inject.Inject
 
@@ -48,7 +51,13 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
     var page: Int = 1
     private lateinit var myRvAdapter : MyRvAdapter
 
+    private lateinit var mBus: RxBus
+
+    private lateinit var subscribe: Subscription
+
     override fun initView() {
+        mBus = RxBus.instance
+
         mPresenter.getData(5, Random().nextInt(102), GirlFragment.GIRL)
         mPresenter.getData(10, page, AndroidFragment.ANDROID)
         srl_android.setOnRefreshListener {
@@ -104,6 +113,15 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
             }
         }
         srl_android.isRefreshing = true
+
+        subscribe = mBus.toObservable(PageChangedEvent::class.java)
+                .subscribe({
+                    t ->
+                    viewpager.currentItem = t.position
+                }, {
+                    e ->
+                    Log.i(TAG, e.message)
+                })
     }
 
     private fun setSearchView() {
@@ -202,5 +220,12 @@ class AndroidFragment : GankContract.View, BaseFragment<FragmentAndroidBinding>(
             else -> {
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (subscribe != null) {
+            subscribe.unsubscribe()
+        }
+        super.onDestroy()
     }
 }

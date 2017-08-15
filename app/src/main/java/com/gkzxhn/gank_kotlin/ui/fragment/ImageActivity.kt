@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.ImageView
@@ -24,6 +25,8 @@ import com.gkzxhn.gank_kotlin.databinding.ActivityImageBinding
 import com.gkzxhn.gank_kotlin.ui.activity.BaseActivity
 import com.gkzxhn.gank_kotlin.ui.adapter.MyPhotoPagerAdapter
 import com.gkzxhn.gank_kotlin.ui.wegit.MyDragPhotoView
+import com.gkzxhn.gank_kotlin.utils.rxbus.PageChangedEvent
+import com.gkzxhn.gank_kotlin.utils.rxbus.RxBus
 import kotlinx.android.synthetic.main.activity_image.*
 
 
@@ -56,10 +59,14 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
     private val mPhotoViews = arrayListOf<ImageView>()
 
+    private lateinit var mBus: RxBus
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun initView() {
 //        mBinding.url = intent.getStringExtra(IMG)
         urls = intent.getStringArrayListExtra(IMG)
+
+        mBus = RxBus.instance
 
         val index = intent.getIntExtra(INDEX, 0)
         for (i in urls.indices) {
@@ -117,7 +124,6 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
             mPhotoViews.add(imageView)
         }
         viewpager_photo.adapter = MyPhotoPagerAdapter(mPhotoViews)
-        viewpager_photo.currentItem = index
 
         viewpager_photo.getViewTreeObserver()
                 .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -152,13 +158,15 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         photoView.setTranslationX(mTranslationX)
                         photoView.setTranslationY(mTranslationY)
 
-                        val bitmap = BitmapTemp.bitmaps[viewpager_photo.currentItem]
+                        Log.i(TAG, "getViewTreeObserver : $mTranslationX ")
+
+                        var bitmap = BitmapTemp.bitmaps[viewpager_photo.currentItem]
+                        if (index == -1) {
+                            bitmap = BitmapTemp.bitmaps[-1]
+                        }
                         if (bitmap != null) {
                             getScaled(bitmap)
                         }
-
-//                        photoView.setScaleX(mScaleX)
-//                        photoView.setScaleY(mScaleY)
 
                         performEnterAnimation()
 
@@ -167,6 +175,30 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
                         }*/
                     }
                 })
+        viewpager_photo.addOnPageChangeListener(object :ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                var bitmap = BitmapTemp.bitmaps[viewpager_photo.currentItem]
+                if (index == -1) {
+                    bitmap = BitmapTemp.bitmaps[-1]
+                }
+                if (bitmap != null) {
+                    mBus.send(PageChangedEvent(position))
+                    getScaled(bitmap)
+                }
+            }
+        })
+        if (index == -1){
+            viewpager_photo.currentItem = 0
+        }else {
+            viewpager_photo.currentItem = index
+        }
     }
 
     /**
@@ -285,12 +317,12 @@ class ImageActivity : BaseActivity<ActivityImageBinding>() {
 
         val photoView = mPhotoViews[viewpager_photo.currentItem] as MyDragPhotoView
         val translateXAnimator = ValueAnimator.ofFloat(0f, mTranslationX)
-        translateXAnimator.addUpdateListener { valueAnimator -> photoView.setX(valueAnimator.animatedValue as Float) }
+        translateXAnimator.addUpdateListener { valueAnimator -> photoView.translateX=valueAnimator.animatedValue as Float }
         translateXAnimator.duration = DURATION
         translateXAnimator.start()
 
         val translateYAnimator = ValueAnimator.ofFloat(0f, mTranslationY)
-        translateYAnimator.addUpdateListener { valueAnimator -> photoView.setY(valueAnimator.animatedValue as Float) }
+        translateYAnimator.addUpdateListener { valueAnimator -> photoView.translateY = valueAnimator.animatedValue as Float }
         translateYAnimator.duration = DURATION
         translateYAnimator.start()
 
