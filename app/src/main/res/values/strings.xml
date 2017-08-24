@@ -4,7 +4,7 @@
     <string name="title_home">首页</string>
     <string name="title_dashboard">视频</string>
     <string name="title_notifications">Notifications</string>
-    <string name="float_behavior">com.gkzxhn.gank_kotlin.ui.wegit.ScrollAwareFABBehaviorDefault</string>
+    <string name="float_behavior">com.gkzxhn.gank_kotlin.ui.wedgit.ScrollAwareFABBehaviorDefault</string>
 
     <string name="xunfei_id">597ee7bd</string>
     <string name="text_begin">请开始说话</string>
@@ -13,5 +13,6 @@
     <string name="default_record_hint">备忘?心情?纪念?统统写/说下来~</string>
     <string name="save2remind">\"已保存至\\\"说写日记\\\"\"</string>
     <string name="update2remind">修改成功</string>
+    <string name="zanshang">支持赞赏开发者</string>
 
 </resources>

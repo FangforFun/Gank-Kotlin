@@ -23,11 +23,11 @@
             app:load_image="@{url}" />
 -->
 
-    <com.gkzxhn.gank_kotlin.ui.wegit.ViewPagerFixed
+    <com.gkzxhn.gank_kotlin.ui.wedgit.ViewPagerFixed
         android:id="@+id/viewpager_photo"
         android:layout_height="match_parent"
         android:layout_width="match_parent">
-    </com.gkzxhn.gank_kotlin.ui.wegit.ViewPagerFixed>
+    </com.gkzxhn.gank_kotlin.ui.wedgit.ViewPagerFixed>
 
     </RelativeLayout>
 

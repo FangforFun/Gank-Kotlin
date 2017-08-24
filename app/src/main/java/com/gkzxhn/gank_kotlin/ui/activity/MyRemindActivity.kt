@@ -11,7 +11,7 @@ import com.gkzxhn.gank_kotlin.bean.entity.Remind
 import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.ActivityMyRemindBinding
 import com.gkzxhn.gank_kotlin.ui.adapter.RemindRecordAdapter
-import com.gkzxhn.gank_kotlin.ui.wegit.SpaceItemDecoration
+import com.gkzxhn.gank_kotlin.ui.wedgit.SpaceItemDecoration
 import com.gkzxhn.gank_kotlin.utils.rxbus.DeleteEvent
 import com.gkzxhn.gank_kotlin.utils.rxbus.RxBus
 import com.greendao.gen.RemindDao

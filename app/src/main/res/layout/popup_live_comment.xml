@@ -4,7 +4,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white">
 
-    <com.gkzxhn.gank_kotlin.ui.wegit.BackEditText
+    <com.gkzxhn.gank_kotlin.ui.wedgit.BackEditText
         android:id="@+id/popup_live_comment_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -16,6 +16,7 @@ import com.gkzxhn.gank_kotlin.bean.entity.Remind
 import com.gkzxhn.gank_kotlin.dao.GreenDaoHelper
 import com.gkzxhn.gank_kotlin.databinding.FragmentGirlBinding
 import com.gkzxhn.gank_kotlin.ui.adapter.PersonalListAdapter
+import com.gkzxhn.gank_kotlin.ui.wedgit.SpaceItemDecoration
 import com.gkzxhn.gank_kotlin.utils.JsonParser
 import com.gkzxhn.gank_kotlin.utils.PopupWindowUtil
 import com.gkzxhn.gank_kotlin.utils.rxbus.DeleteEvent
@@ -76,8 +77,10 @@ class GirlFragment : BaseFragment<FragmentGirlBinding>(){
 
         rv_personal.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         mList.add(PersonalInfo(R.drawable.remind_record, resources.getString(R.string.remind_record)))
+        mList.add(PersonalInfo(R.drawable.zanshang, resources.getString(R.string.zanshang)))
         mAdapter = PersonalListAdapter(context, mList)
         rv_personal.adapter = mAdapter
+        rv_personal.addItemDecoration(SpaceItemDecoration(2, 2))
 
         // 初始化识别无UI识别对象
         // 使用SpeechRecognizer对象，可根据回调消息自定义界面；

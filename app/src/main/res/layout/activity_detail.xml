@@ -27,7 +27,7 @@
         </android.support.v7.widget.Toolbar>
 
 
-        <com.gkzxhn.gank_kotlin.ui.wegit.ProgressWebView
+        <com.gkzxhn.gank_kotlin.ui.wedgit.ProgressWebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

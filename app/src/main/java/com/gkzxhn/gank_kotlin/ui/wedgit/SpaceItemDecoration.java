@@ -1,4 +1,4 @@
-package com.gkzxhn.gank_kotlin.ui.wegit;
+package com.gkzxhn.gank_kotlin.ui.wedgit;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

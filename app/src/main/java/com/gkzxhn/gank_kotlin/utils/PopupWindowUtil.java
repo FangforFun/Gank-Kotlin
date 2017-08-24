@@ -14,7 +14,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.gkzxhn.gank_kotlin.R;
-import com.gkzxhn.gank_kotlin.ui.wegit.BackEditText;
+import com.gkzxhn.gank_kotlin.ui.wedgit.BackEditText;
 
 import java.util.Timer;
 import java.util.TimerTask;

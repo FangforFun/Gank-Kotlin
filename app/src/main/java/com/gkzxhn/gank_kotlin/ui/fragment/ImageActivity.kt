@@ -24,7 +24,7 @@ import com.gkzxhn.gank_kotlin.bean.info.BitmapTemp
 import com.gkzxhn.gank_kotlin.databinding.ActivityImageBinding
 import com.gkzxhn.gank_kotlin.ui.activity.BaseActivity
 import com.gkzxhn.gank_kotlin.ui.adapter.MyPhotoPagerAdapter
-import com.gkzxhn.gank_kotlin.ui.wegit.MyDragPhotoView
+import com.gkzxhn.gank_kotlin.ui.wedgit.MyDragPhotoView
 import com.gkzxhn.gank_kotlin.utils.rxbus.PageChangedEvent
 import com.gkzxhn.gank_kotlin.utils.rxbus.RxBus
 import kotlinx.android.synthetic.main.activity_image.*

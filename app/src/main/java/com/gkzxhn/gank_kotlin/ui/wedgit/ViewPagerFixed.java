@@ -1,4 +1,4 @@
-package com.gkzxhn.gank_kotlin.ui.wegit;
+package com.gkzxhn.gank_kotlin.ui.wedgit;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
